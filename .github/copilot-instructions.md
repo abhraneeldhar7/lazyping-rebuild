@@ -1,0 +1,6 @@
+-For backend functions, use app/actions folder for server actions.
+-Use types.ts to store types, donot use mongodb schemas.
+-Try to avoid mongodb object type for ids as much as possible, hide that while returning data from backend. Only use the specified primary key in objects.
+-Use .env not .env.local or anything else.
+-DO NOT do extra stuff than asked, only change files and do the things specifed in the prompts.
+-Learn UI designs from people working for reputable multi million dollar company codebases, design is everything.
