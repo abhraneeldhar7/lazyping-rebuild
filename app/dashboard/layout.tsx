@@ -35,7 +35,7 @@ export default async function DashboardLayout({
         </div>
 
 
-        <div className="fixed flex px-[15px] items-center top-[50px] h-[40px] bg-background w-full z-[10] ">
+        <div className="fixed flex px-[15px] items-center top-[50px] h-[40px] backdrop-blur-[20px] bg-background/50 w-full z-[10] ">
             {dashboardTabs.map((tab, index) => (
                 <Link key={index} href={tab.href}>
                     <Button variant="ghost" className="font-[400] rounded-[4px] h-[30px] text-[12px]">{tab.label}</Button>
