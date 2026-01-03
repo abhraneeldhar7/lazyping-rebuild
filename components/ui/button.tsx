@@ -10,7 +10,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        shinny: "bg-primary hover:bg-primary/80 shadow-sm",
+        shinny: "bg-primary hover:bg-primary/80 text-[white] shadow-sm",
         default:
           "bg-foreground text-background shadow-xs hover:bg-foreground/80",
         destructive:

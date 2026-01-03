@@ -13,7 +13,9 @@ export default async function FooterComponent() {
             <div className="flex justify-between">
                 {userId ?
                     <Image src="/appLogo.png" alt="" height={30} width={30} className="object-contain w-[40px] h-[40px]" /> :
-                    <Button variant="shinny">Login</Button>
+                    <Link href="/login" className="">
+                        <Button variant="shinny">Login</Button>
+                    </Link>
                 }
 
                 <AnimatedThemeToggler />

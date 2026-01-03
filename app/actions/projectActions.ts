@@ -58,10 +58,12 @@ export async function deleteProject(projectId: string) {
 
     const db = await getDB();
     await db.collection("projects").deleteOne({ projectId: projectId, ownerId: userId });
+    await db.collection("endpoints").deleteMany({ projectId: projectId });
+    await db.collection("logs").deleteMany({ projectId: projectId });
     revalidatePath("/dashboard");
 }
 
-export async function updateProject(projectData: ProjectType) {
+export async function saveProject(projectData: ProjectType) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -71,7 +73,7 @@ export async function updateProject(projectData: ProjectType) {
             projectName: projectData.projectName
         }
     });
-    revalidatePath("/dashboard");
+    revalidatePath(`/project/${projectData.projectId}`);
 }
 
 export async function getProjectDetails(projectId: string) {
