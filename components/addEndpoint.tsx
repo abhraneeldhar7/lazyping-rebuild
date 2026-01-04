@@ -12,8 +12,10 @@ import { toast } from "sonner";
 import { ScrollArea } from "./ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
 import { createEndpoint } from "@/app/actions/endpointActions";
+import { useRouter } from "next/navigation";
 
 export default function AddEndpointBtn({ projectId }: { projectId: string }) {
+    const router = useRouter();
     const defaultNewEndpoint = {
         url: "",
         method: "GET" as methodType,
@@ -31,8 +33,10 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
         if (newEndpoint.url.length < 1) return;
         setLoading(true);
         try {
-            await createEndpoint(newEndpoint);
+            const res = await createEndpoint(newEndpoint);
             toast.success("Endpoint created successfully");
+            // setOpenDialog(false);
+            router.push(`/project/${projectId}/e/${res}`)
         } catch (e) {
             toast.error("Failed to create endpoint");
             setLoading(false);
@@ -40,7 +44,7 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
 
     }
 
-
+    const [openDialog, setOpenDialog] = useState(false);
     const [testResponse, setTestResponse] = useState<string | null>(null);
 
     const testPing = async () => {
@@ -70,7 +74,10 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
     return (
         <div className="flex flex-col gap-[15px] w-full">
 
-            <Dialog onOpenChange={() => { setNewEndpoint(defaultNewEndpoint) }}>
+            <Dialog open={openDialog} onOpenChange={(e) => {
+                setNewEndpoint(defaultNewEndpoint);
+                setOpenDialog(e)
+            }}>
                 <DialogTrigger asChild>
                     <Button className="w-fit mx-auto" variant="shinny"><PlusIcon /> Add Endpoint</Button>
                 </DialogTrigger>
@@ -78,9 +85,11 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
                     <DialogTitle>Add an endpoint</DialogTitle>
                     <DialogDescription className="hidden" />
 
-                    <div className="rounded-[12px] text-[15px] bg-blue-600/20 border px-[20px] py-[15px] ">
-                        <p>Adding headers and environment secrets for endpoints is in development</p>
-                    </div>
+                    {!testResponse &&
+                        <div className="rounded-[12px] text-[15px] bg-blue-600/20 border px-[20px] py-[15px] ">
+                            <p>Adding headers and environment secrets for endpoints is in development</p>
+                        </div>
+                    }
 
                     <div className="flex flex-col gap-[20px] mt-[10px]">
                         <div className="flex flex-col gap-[10px]">

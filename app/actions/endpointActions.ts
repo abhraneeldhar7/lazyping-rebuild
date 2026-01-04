@@ -1,7 +1,7 @@
 "use server"
 
 import { getDB } from "@/lib/db";
-import { EndpointType, methodType } from "@/lib/types";
+import { EndpointType, methodType, PingLog } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
@@ -39,17 +39,32 @@ export async function createEndpoint(data: {
         lastPingedAt: null,
         headers: data.headers,
         body: data.body,
-        latencyAvg: null,
+        latency: null,
         nextPingAt: new Date(),
         lastStatusChange: new Date(),
     };
 
     await db.collection("endpoints").insertOne(newEndpoint);
     revalidatePath(`/project/${data.projectId}`);
+    return (newEndpoint.endpointId)
 }
 
 
-export async function toggleEndpoint(endpointId: string, enabled: boolean) {
+export async function getEndpoints(projectId: string) {
+    const db = await getDB();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const project = await db.collection("projects").findOne({ projectId: projectId, ownerId: userId })
+    if (!project) throw new Error("Unauthorized");
+
+    const endpoints = await db.collection<EndpointType>("endpoints").find({ projectId: projectId }, { projection: { _id: 0 } }).toArray();
+
+    return endpoints;
+}
+
+
+export async function getEndpointLogs(endpointId: string) {
     const db = await getDB();
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -57,12 +72,34 @@ export async function toggleEndpoint(endpointId: string, enabled: boolean) {
     const endpoint = await db.collection("endpoints").findOne({ endpointId: endpointId })
     if (!endpoint) throw new Error("Unauthorized");
 
-    const project = await db.collection("projects").findOne({ projectId: endpoint.projectId })
+    return await db.collection<PingLog>("logs").find({ endpointId: endpointId }, { projection: { _id: 0 } }).toArray();
+}
+
+export async function getEndpointDetails(id: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+    const db = await getDB();
+
+    const endpoint = await db.collection<EndpointType>("endpoints").findOne({ endpointId: id })
+    if (!endpoint) throw new Error("Unauthorized");
+
+    const project = await db.collection("projects").findOne({ projectId: endpoint.projectId, ownerId: userId })
     if (!project) throw new Error("Unauthorized");
 
-    if (project.ownerId != userId) throw new Error("Unauthorized");
+    return endpoint;
+}
 
-    await db.collection("endpoints").updateOne({ endpointId: endpointId }, { $set: { enabled: enabled, nextPingAt: enabled ? new Date() : null } })
+export async function deleteEndpoint(id: string) {
+    const db = await getDB();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
 
+    const endpoint = await db.collection("endpoints").findOne({ endpointId: id })
+    if (!endpoint) throw new Error("Unauthorized");
+
+    const project = await db.collection("projects").findOne({ projectId: endpoint.projectId, ownerId: userId })
+    if (!project) throw new Error("Unauthorized");
+
+    await db.collection("endpoints").deleteOne({ endpointId: id })
     revalidatePath(`/project/${endpoint.projectId}`);
 }

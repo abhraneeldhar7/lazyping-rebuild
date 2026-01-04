@@ -12,7 +12,9 @@ import { toast } from "sonner";
 
 export default function ProjectSettingsPage() {
     const router = useRouter();
-    const projectData = useProject();
+    const { projectData } = useProject();
+
+    if (!projectData) return null;
     const [newName, setNewName] = useState("");
     const [loading, setLoading] = useState(false);
 

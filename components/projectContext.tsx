@@ -1,16 +1,34 @@
 "use client"
-import { ProjectType } from "@/lib/types"
+import { EndpointType, PingLog, ProjectType } from "@/lib/types"
 import { createContext, useContext } from "react"
-const ProjectContext = createContext<ProjectType | null>(null)
+
+
+
+interface ProjectContextType {
+    projectData: ProjectType
+    endpoints: EndpointType[]
+    logs: PingLog[]
+}
+
+const ProjectContext = createContext<ProjectContextType | null>(null)
+
 export function ProjectContextProvider({
     projectData,
+    endpoints,
+    logs,
     children,
 }: {
-    projectData: ProjectType | null,
+    projectData: ProjectType,
+    endpoints: EndpointType[],
+    logs: PingLog[]
     children: React.ReactNode
 }) {
     return (
-        <ProjectContext.Provider value={projectData}>
+        <ProjectContext.Provider value={{
+            projectData,
+            endpoints,
+            logs
+        }}>
             {children}
         </ProjectContext.Provider>
     )

@@ -155,13 +155,7 @@ export function ChartAreaInteractive() {
 
   return (
     <Card className="pt-0 dark:bg-muted/50 border-0">
-      <CardHeader className="flex items-center gap-2 space-y-0 py-5 sm:flex-row">
-        <div className="grid flex-1 gap-1">
-          <CardTitle>Latency chart for this project</CardTitle>
-          <CardDescription>
-            Showing response time for the last month
-          </CardDescription>
-        </div>
+      <CardContent className="p-4 flex flex-col gap-[30px] min-h-[300px]">
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
             className="w-[160px] rounded-lg sm:ml-auto sm:flex"
@@ -181,8 +175,6 @@ export function ChartAreaInteractive() {
             </SelectItem>
           </SelectContent>
         </Select>
-      </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"

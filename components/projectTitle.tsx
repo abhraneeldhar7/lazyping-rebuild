@@ -7,7 +7,7 @@ function capitalize(str: string) {
     return (str[0].toUpperCase() + str.slice(1, str.length).toLowerCase())
 }
 export default function ProjectTitle({ projectName }: { projectName: string }) {
-    const pathList = usePathname().split("/").slice(1, usePathname().split("/").length);
+    const pathList = usePathname().split("/").slice(1, 3);
     // const pathname = pathList.split("/")[pathList.split("/").length - 1]
 
     return (
