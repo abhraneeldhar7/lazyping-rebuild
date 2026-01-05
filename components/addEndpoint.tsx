@@ -125,7 +125,7 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <Label>Expected response</Label>
-                            <Textarea value={newEndpoint.expectedResponse} onChange={(e) => {
+                            <Textarea className="max-h-[200px]" value={newEndpoint.expectedResponse} onChange={(e) => {
                                 setNewEndpoint(prev => {
                                     return { ...prev, expectedResponse: e.target.value.trim() }
                                 })

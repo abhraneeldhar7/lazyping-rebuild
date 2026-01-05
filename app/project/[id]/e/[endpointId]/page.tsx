@@ -9,6 +9,7 @@ import Link from "next/link";
 export default async function EndpointPage({ params }: { params: Promise<{ endpointId: string }> }) {
     const { endpointId } = await params;
     const endpointDetails = await getEndpointDetails(endpointId);
+    console.log(endpointDetails)
     const logs = await getEndpointLogs(endpointId);
 
     return (
@@ -21,12 +22,12 @@ export default async function EndpointPage({ params }: { params: Promise<{ endpo
                     <Button className="h-[30px] text-[12px]"><SettingsIcon className="p-[1px]" /> Settings</Button>
                 </Link>
             </div>
-            <NextPingComponent />
+            <NextPingComponent endpoints={[JSON.parse(JSON.stringify(endpointDetails))]} />
 
             {/* <ChartAreaInteractive /> */}
-            <div>
+            {/* <div>
                 <BarUptime logs={logs} />
-            </div>
+            </div> */}
         </div>
     )
 }

@@ -8,18 +8,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProjects } from "../actions/projectActions";
 import { ProjectType } from "@/lib/types";
+import { getEndpoints } from "@/app/actions/endpointActions";
 import NextPingComponent from "@/components/nextPing";
+import { AutoRefresh } from "@/components/autoRefresh";
 
 export default async function Dashboard() {
 
     const projectsArray = await getProjects();
 
+    const endpointsPromises = projectsArray.map(async (project) => {
+        return await getEndpoints(project.projectId);
+    });
+
+    // Flatten the array of arrays
+    const allEndpoints = (await Promise.all(endpointsPromises)).flat();
+
 
     return (
 
         <div className="pt-[15px] pb-[30px]">
+            <AutoRefresh />
 
-            <NextPingComponent />
+            <NextPingComponent endpoints={JSON.parse(JSON.stringify(allEndpoints))} />
 
             <div className="flex md:flex-row flex-col md:gap-[30px] gap-[20px] mt-[30px]">
 

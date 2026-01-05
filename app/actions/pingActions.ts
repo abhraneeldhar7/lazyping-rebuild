@@ -32,21 +32,29 @@ function determineStatus(
  * Note: Requires 'projectName' passed separately as it's not in the EndpointType usually.
  */
 export async function pingEndpoint(
-    endpointId: string
+    endpointOrId: string | EndpointType,
+    dbInstance?: any
 ): Promise<PingLog> {
-    const db = await getDB()
-    const endpoint = await getEndpointDetails(endpointId)
+    const db = dbInstance || await getDB()
+
+    let endpoint: EndpointType;
+    if (typeof endpointOrId === 'string') {
+        endpoint = await getEndpointDetails(endpointOrId);
+    } else {
+        endpoint = endpointOrId;
+    }
+
     const controller = new AbortController();
     // Use endpoint.intervalMinutes or a dedicated timeout field if you add one later.
     // Defaulting to 10 seconds timeout to prevent hanging.
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const startTime = performance.now();
 
     let response: Response | null = null;
     let error: any = null;
     let responseBody: string | null = null;
 
+    const startTime = performance.now();
     try {
         response = await fetch(endpoint.url, {
             method: endpoint.method,
@@ -68,6 +76,40 @@ export async function pingEndpoint(
     const latency = Math.round(endTime - startTime);
     const status = determineStatus(response, error);
 
+    // Generate a human-readable summary based on status
+    let logSummary: string;
+
+    switch (status) {
+        case "OK":
+            logSummary = `${endpoint.method} ${endpoint.url} responded with ${response?.status} in ${latency}ms`;
+            break;
+        case "TIMEOUT":
+            logSummary = `Request timed out after 5000ms`;
+            break;
+        case "DNS":
+            logSummary = `DNS resolution failed`;
+            break;
+        case "CONN_REFUSED":
+            logSummary = `Connection refused`;
+            break;
+        case "TLS":
+            logSummary = `SSL/TLS handshake failed`;
+            break;
+        case "RATE_LIMITED":
+            logSummary = `Rate limit exceeded (429)`;
+            break;
+        case "HTTP_4XX":
+            logSummary = `Client error: ${response?.status}`;
+            break;
+        case "HTTP_5XX":
+            logSummary = `Server error: ${response?.status}`;
+            break;
+        default:
+            const msg = error instanceof Error ? error.message : typeof error === 'string' ? error : "Unknown error";
+            logSummary = `Ping failed: ${msg}`;
+            break;
+    }
+
     // Construct the Log
     const log: PingLog = {
         projectId: endpoint.projectId,
@@ -83,10 +125,12 @@ export async function pingEndpoint(
         responseMessage: responseBody,
         errorMessage: error instanceof Error ? error.message : typeof error === 'string' ? error : null,
 
-        logSummary: `${endpoint.method} ${endpoint.url} responded with ${response?.status || 'ERROR'} in ${latency}ms`
+        logSummary
     };
 
-    await db.collection('ping_logs').insertOne(log);
+    // --- DB Operations ---
+    await db.collection('logs').insertOne(log);
+
     const isSuccess = log.status === "OK";
     const newStatus = isSuccess ? "UP" : "DOWN";
     const statusChanged = endpoint.currentStatus !== newStatus;
@@ -114,10 +158,18 @@ export async function pingEndpoint(
         const allEndpoints = await db.collection("endpoints")
             .find({ projectId: endpoint.projectId }).toArray();
 
-        const downCount = allEndpoints.filter(e => e.currentStatus === "DOWN").length;
+        // Calculate this project status based on all endpoints status
+        // We might need to refetch the current endpoint status if it wasn't updated in memory?
+        // Actually we just updated it in DB, but 'allEndpoints' might fetch the old one if we are not careful or if this is within a transaction (unlikely here).
+        // Since we just updated "endpoints", the find() should return updated data.
+        // Let's manually overwrite the current one in the array to be safe if read-after-write is delayed (unlikely in Mongo default read preference but possible).
+
+        const updatedAll = allEndpoints.map((e: any) => e.endpointId === endpoint.endpointId ? { ...e, currentStatus: newStatus } : e);
+
+        const downCount = updatedAll.filter((e: any) => e.currentStatus === "DOWN").length;
         let projectStatus: ProjectType['overallStatus'] = "OPERATIONAL";
 
-        if (downCount === allEndpoints.length) {
+        if (downCount === updatedAll.length) {
             projectStatus = "MAJOR_OUTAGE";
         } else if (downCount > 0) {
             projectStatus = "PARTIAL_OUTAGE";
@@ -129,5 +181,5 @@ export async function pingEndpoint(
         );
     }
 
-    return (log)
+    return JSON.parse(JSON.stringify(log));
 }

@@ -72,7 +72,37 @@ export async function getEndpointLogs(endpointId: string) {
     const endpoint = await db.collection("endpoints").findOne({ endpointId: endpointId })
     if (!endpoint) throw new Error("Unauthorized");
 
-    return await db.collection<PingLog>("logs").find({ endpointId: endpointId }, { projection: { _id: 0 } }).toArray();
+    return await db.collection<PingLog>("logs").find({ endpointId: endpointId }, { projection: { _id: 0 } }).sort({ timestamp: -1 }).limit(100).toArray();
+}
+
+
+export async function updateEndpoint(data: EndpointType) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const db = await getDB();
+
+    const endpoint = await db.collection<EndpointType>("endpoints").findOne({ endpointId: data.endpointId })
+    if (!endpoint) throw new Error("Unauthorized");
+
+    const project = await db.collection("projects").findOne({ projectId: endpoint.projectId, ownerId: userId })
+    if (!project) throw new Error("Unauthorized");
+
+    await db.collection("endpoints").updateOne(
+        { endpointId: data.endpointId },
+        {
+            $set: {
+                url: data.url,
+                method: data.method,
+                intervalMinutes: data.intervalMinutes,
+                expectedResponse: data.expectedResponse,
+                body: data.body,
+                headers: data.headers,
+                enabled: data.enabled
+            }
+        }
+    );
+    revalidatePath(`/project/${endpoint.projectId}`);
 }
 
 export async function getEndpointDetails(id: string) {

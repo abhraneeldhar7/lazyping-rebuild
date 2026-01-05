@@ -22,7 +22,7 @@ export default function ProjectCard({ project }: { project: ProjectType }) {
 
         <div className="flex gap-[10px] justify-between items-end z-[2]">
             <p className="pl-[5px] text-[12px] opacity-[0.8] flex gap-[5px] items-center"><ChartNoAxesColumnIncreasing size={12} /> 200ms</p>
-            <BarUptime />
+            {/* <BarUptime /> */}
         </div>
     </Link>)
 }

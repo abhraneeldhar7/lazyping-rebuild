@@ -87,7 +87,7 @@ export async function getProjectDetails(projectId: string) {
 export async function getProjectLogs(projectId: string) {
     const db = await getDB();
     const logs = await db.collection("logs").find({ projectId: projectId }, { projection: { _id: 0 } })
-        .sort({ createdAt: -1 })
+        .sort({ timestamp: -1 })
         .toArray() as PingLog[] | [];
     return logs;
 }
