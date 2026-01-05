@@ -8,7 +8,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-export default function BarUptime({ logs }: { logs: PingLog[] }) {
+export default function BarUptime({ logs, hideLabel = false, hideTooltip = false }: { logs: PingLog[], hideLabel?: boolean, hideTooltip?: boolean }) {
     const buckets = useMemo(() => {
         const now = new Date();
         const result = [];
@@ -39,38 +39,48 @@ export default function BarUptime({ logs }: { logs: PingLog[] }) {
     const getColor = (status: "UP" | "DOWN" | "NONE") => {
         if (status === "UP") return "linear-gradient(180deg, #5fffb4ff 0%, #00ff88 50%, #007a3d 100%)";
         if (status === "DOWN") return "linear-gradient(180deg, #ff5858ff 0%, #ff0000 50%, #a70202ff 100%)";
-        return "var(--background)";
+        return "var(--muted)";
     };
 
     return (
         <TooltipProvider>
             <div className="flex flex-col gap-[10px] h-fit w-fit">
                 <div className="flex gap-[3px] flex-1 justify-end">
-                    {buckets.map((bucket, index) => (
-                        <Tooltip key={index}>
-                            <TooltipTrigger asChild>
-                                <div
-                                    className={`rounded-[1px] h-[35px] w-[7px] cursor-pointer ${bucket.status === "NONE" ? "border border-border/30" : ""}`}
-                                    style={{
-                                        background: getColor(bucket.status)
-                                    }}
-                                />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <div className="text-[12px]">
-                                    <p className="font-medium">
-                                        {bucket.status === "UP" ? "Operational" : bucket.status === "DOWN" ? "Outage detected" : "No data"}
-                                    </p>
-                                    <p className="opacity-70">
-                                        {bucket.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {bucket.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                    {bucket.count > 0 && <p className="opacity-70">{bucket.count} checks</p>}
-                                </div>
-                            </TooltipContent>
-                        </Tooltip>
-                    ))}
+                    {buckets.map((bucket, index) => {
+                        const Bar = (
+                            <div
+                                className={`rounded-[1px] h-[35px] w-[7px] cursor-pointer ${bucket.status === "NONE" ? "border border-border/30" : ""}`}
+                                style={{
+                                    background: getColor(bucket.status)
+                                }}
+                            />
+                        );
+
+                        if (hideTooltip) return <div key={index}>{Bar}</div>;
+
+                        return (
+                            <Tooltip key={index}>
+                                <TooltipTrigger asChild>
+                                    {Bar}
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <div className="text-[12px]">
+                                        <p className="font-medium">
+                                            {bucket.status === "UP" ? "Operational" : bucket.status === "DOWN" ? "Outage detected" : "No data"}
+                                        </p>
+                                        <p className="opacity-70 mt-1">
+                                            {bucket.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {bucket.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                        {bucket.count > 0 && <p className="opacity-70">{bucket.count} checks</p>}
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        )
+                    })}
                 </div>
-                <p className="text-[12px] opacity-[0.7] text-center w-full">Last 24 hr</p>
+                {!hideLabel &&
+                    <p className="text-[12px] opacity-[0.7] text-center w-full">Last 24 hr</p>
+                }
             </div>
         </TooltipProvider>
     )

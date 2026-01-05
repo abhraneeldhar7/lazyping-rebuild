@@ -154,9 +154,9 @@ export function ChartAreaInteractive({ logs }: { logs: PingLog[] }) {
                 </Select>
             </div>
 
-            <div className="relative w-full">
-                <div className="h-[250px] absolute z-[4] top-0 left-[-2px] w-[50px] bg-gradient-to-r from-background from-[20%] to-transparent to-[100%]" />
-                <div className="h-[250px] absolute z-[4] top-0 right-[-2px] w-[50px] bg-gradient-to-l from-background from-[20%] to-transparent to-[100%]" />
+            <div className="relative w-full" >
+                <div className="h-[250px] absolute z-[4] top-0 left-[-2px] w-[25px] bg-gradient-to-r from-background from-[10%] to-transparent to-[90%]" />
+                <div className="h-[250px] absolute z-[4] top-0 right-[-2px] w-[25px] bg-gradient-to-l from-background from-[10%] to-transparent to-[90%]" />
 
                 <ChartContainer
                     config={chartConfig}
