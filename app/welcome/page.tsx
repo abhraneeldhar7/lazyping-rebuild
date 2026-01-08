@@ -5,12 +5,13 @@ import styles from "./animations.module.css"
 import { GithubIntegartionPrompt } from "@/components/githubIntegrationPrompt";
 import { completeOnboarding } from "../actions/onboarding";
 import { useSession } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 
 export default function WelcomePage() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const { session } = useSession();
-
+    const router = useRouter();
     const questions = [
         {
             title: "Define your usecase",
@@ -45,6 +46,7 @@ export default function WelcomePage() {
                                     await completeOnboarding();
                                     await session?.reload();
                                 }
+                                router.push("/dashboard")
                             }}>
                                 {option}
                             </Button>
