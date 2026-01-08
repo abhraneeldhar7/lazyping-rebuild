@@ -86,6 +86,10 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                 </TableBody>
             </Table>
 
+            {logsData.length == 0 &&
+                <p className="text-center my-[20px] opacity-[0.8] text-[15px]">No logs to show</p>
+            }
+
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
 
                 <SheetContent side={isMobile ? "bottom" : "right"} className="ring-0 outline-0 focus:ring-0 focus:outline-0 focus:ring-offset-0 focus:outline-offset-0 md:py-[16px] md:px-[20px] px-[15px] py-[10px]">

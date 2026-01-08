@@ -17,7 +17,7 @@ export default function NewProjectBtn() {
 
     return (
         <div >
-            <Dialog>
+            <Dialog onOpenChange={() => { setProjectName("") }}>
                 <DialogTrigger asChild>
                     <Button variant="shinny">
                         New Project
@@ -66,7 +66,7 @@ export default function NewProjectBtn() {
                             {!loading ?
                                 <>
                                     <DialogClose>Cancel</DialogClose>
-                                    <Button variant="shinny" type="submit">Create</Button>
+                                    <Button disabled={projectName.length < 3} variant="shinny" type="submit">Create</Button>
                                 </>
                                 :
                                 <div className="h-[36px] w-[35px] ml-auto flex items-center justify-center">
