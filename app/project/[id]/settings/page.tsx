@@ -40,13 +40,13 @@ export default function ProjectSettingsPage() {
         </form>
 
 
-        <div className="flex flex-col gap-[4px] my-[20px] md:my-[50px]">
+        {/* <div className="flex flex-col gap-[4px] my-[20px] md:my-[50px]">
             <h1 className="text-[19px]">Configure Github</h1>
             <div className="flex gap-[20px] justify-between items-end flex-wrap">
                 <p className="opacity-[0.8]">Configure the github repository for this project.</p>
                 <Button variant="outline" className="mx-auto md:mx-0 h-[40px] w-[150px]"><GithubIcon /> Configure</Button>
             </div>
-        </div>
+        </div> */}
         <div className="flex flex-col gap-[4px] my-[20px] md:my-[50px]">
             <h1 className="text-[19px]">Pause project</h1>
             <div className="flex gap-[20px] justify-between items-end flex-wrap">

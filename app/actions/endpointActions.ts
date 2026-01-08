@@ -105,18 +105,18 @@ export async function updateEndpoint(data: EndpointType) {
     revalidatePath(`/project/${endpoint.projectId}`);
 }
 
-export async function getEndpointDetails(id: string) {
+export async function getEndpointDetails(id: string): Promise<EndpointType> {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
     const db = await getDB();
 
-    const endpoint = await db.collection<EndpointType>("endpoints").findOne({ endpointId: id })
+    const endpoint = await db.collection<EndpointType>("endpoints").findOne({ endpointId: id }, { projection: { _id: 0 } })
     if (!endpoint) throw new Error("Unauthorized");
 
     const project = await db.collection("projects").findOne({ projectId: endpoint.projectId, ownerId: userId })
     if (!project) throw new Error("Unauthorized");
 
-    return endpoint;
+    return JSON.parse(JSON.stringify(endpoint));
 }
 
 export async function deleteEndpoint(id: string) {
@@ -132,4 +132,20 @@ export async function deleteEndpoint(id: string) {
 
     await db.collection("endpoints").deleteOne({ endpointId: id })
     revalidatePath(`/project/${endpoint.projectId}`);
+}
+
+export async function toggleEndpoint(endpoint: EndpointType) {
+    const db = await getDB();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    await db.collection("endpoints").updateOne(
+        { endpointId: endpoint.endpointId },
+        {
+            $set: {
+                enabled: !endpoint.enabled
+            }
+        }
+    );
+    revalidatePath(`/project/${endpoint.projectId}/e/${endpoint.endpointId}`);
 }

@@ -91,3 +91,17 @@ export async function getProjectLogs(projectId: string) {
         .toArray() as PingLog[] | [];
     return logs;
 }
+
+export async function getAllUserProjectLogs() {
+    const db = await getDB();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+    const projects = await getProjects();
+    const projectIds = projects.map(project => project.projectId);
+
+    const logs = await db.collection("logs").find({ projectId: { $in: projectIds } }, { projection: { _id: 0 } })
+        .sort({ timestamp: -1 })
+        .toArray() as PingLog[] | [];
+
+    return JSON.parse(JSON.stringify(logs));
+}

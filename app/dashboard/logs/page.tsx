@@ -1,8 +1,10 @@
+import { getAllUserProjectLogs } from "@/app/actions/projectActions";
 import LogsPageComponent from "@/components/logsComponent";
 
 
-export default function DashboardLogsPage() {
+export default async function DashboardLogsPage() {
+    const logs = await getAllUserProjectLogs();
     return (<div>
-        <LogsPageComponent />
+        <LogsPageComponent logs={logs} />
     </div>)
 }

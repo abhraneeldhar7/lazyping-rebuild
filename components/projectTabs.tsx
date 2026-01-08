@@ -22,6 +22,7 @@ export default function ProjectTabs({ projectId }: { projectId: string }) {
     const endpointTabs = [
         { label: "Project", href: `/project/${projectId}` },
         { label: "Overview", href: `/project/${projectId}/e/${endpointId}` },
+        { label: "Logs", href: `/project/${projectId}/e/${endpointId}/logs` },
         { label: "Settings", href: `/project/${projectId}/e/${endpointId}/settings` },
     ]
 

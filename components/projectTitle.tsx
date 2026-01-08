@@ -3,6 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation"
 import { EndpointType } from "@/lib/types";
+import Link from "next/link";
 
 function capitalize(str: string) {
     return (str[0].toUpperCase() + str.slice(1, str.length).toLowerCase())
@@ -30,13 +31,13 @@ export default function ProjectTitle({ projectName, endpoints }: { projectName: 
     return (
         <div className="flex gap-[10px] items-center">
             <div className="flex gap-[10px] items-center leading-[1em]">
-                <p className={`text-[15px] ${isEndpointPage ? "opacity-[0.7]" : ""}`} >{projectName}</p>
+                <Link href={`/project/${projectId}`} className={`select-none cursor-pointer text-[15px] ${isEndpointPage ? "opacity-[0.7]" : ""}`} >{projectName}</Link>
             </div>
             {isEndpointPage && (
                 <>
                     <ChevronRight size={14} className="opacity-[0.3]" />
                     <div className="flex gap-[10px] items-center leading-[1em]">
-                        <p className={`text-[15px] font-medium`} >{endpointDisplay || "Endpoint"}</p>
+                        <Link href={`/project/${projectId}/e/${endpointId}`} className={`select-none cursor-pointer text-[15px] font-medium`} >{endpointDisplay || "Endpoint"}</Link>
                     </div>
                 </>
             )}

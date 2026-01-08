@@ -1,9 +1,12 @@
-export default async function ProjectLogsPage({ params }: { params: Promise<{ id: string }> }) {
-    const param = (await params).id
+import { getProjectLogs } from "@/app/actions/projectActions"
+import LogsPageComponent from "@/components/logsComponent"
 
+export default async function ProjectLogsPage({ params }: { params: Promise<{ id: string }> }) {
+    const projectId = (await params).id
+    const logs = await getProjectLogs(projectId)
     return (
         <div>
-            <h1>Logs</h1>
+            <LogsPageComponent logs={logs} />
         </div>
     )
 }

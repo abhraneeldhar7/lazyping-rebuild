@@ -3,10 +3,10 @@ import ProjectCard from "@/components/projectCard";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { UserPopoverComponent } from "@/components/userPopover";
-import { CheckCircle, PackageOpen, XCircle } from "lucide-react";
+import { CheckCircle, ChevronRight, PackageOpen, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getProjects } from "../actions/projectActions";
+import { getAllUserProjectLogs, getProjects } from "../actions/projectActions";
 import { ProjectType } from "@/lib/types";
 import { getEndpoints } from "@/app/actions/endpointActions";
 import NextPingComponent from "@/components/nextPing";
@@ -22,6 +22,15 @@ export default async function Dashboard() {
 
     // Flatten the array of arrays
     const allEndpoints = (await Promise.all(endpointsPromises)).flat();
+
+    const allLogs = await getAllUserProjectLogs();
+    const alertLogs = allLogs.filter((log: any) => log.status !== "OK").slice(0, 3);
+    const recentLogs = allLogs.slice(0, 3);
+
+    const projectMap = projectsArray.reduce((acc: any, proj) => {
+        acc[proj.projectId] = proj.projectName;
+        return acc;
+    }, {});
 
 
     return (
@@ -39,23 +48,31 @@ export default async function Dashboard() {
                             <Label className="pl-[5px]">Alert</Label>
                             <div className={`rounded-[6px] border border-border/40 w-full mt-[10px] bg-muted dark:bg-muted/80 p-[4px] flex flex-col gap-[4px]`}>
 
-                                {/* <div className="h-[50px] rounded-[2px] border border-[var(--error)]/18 bg-[var(--error)]/8 flex items-center px-[10px] text-[14px] gap-[10px]">
-                                    <XCircle size={16} className="text-[var(--error)]" />
-                                    <p className="opacity-[0.5] truncate w-[90px]">Project Name</p>
-                                    <ChevronRight size={14} className="opacity-[0.7]" />
-                                    <p className="opacity-[0.9] flex-1 truncate">Error in endpoint</p>
-                                    <p className="opacity-[0.8] text-[12px] pr-[4px]">3 am</p>
-                                </div>
-
-
-                                <Button className="w-full h-[30px] text-[12px]" variant="ghost">More</Button> */}
-
-                                <div className="h-[100px] bg-[var(--success)]/5 rounded-[4px] flex items-center justify-center border-[2px] border-[var(--success)]/10 gap-[10px]">
-                                    <p className="text-[14px] leading-[1em]">
-                                        No alerts so far
-                                    </p>
-                                    <CheckCircle size={16} className="text-[var(--success)]" />
-                                </div>
+                                {alertLogs.length > 0 ? (
+                                    <>
+                                        {alertLogs.map((log: any, index: number) => (
+                                            <div key={index} className="h-[50px] rounded-[2px] border border-[var(--error)]/18 bg-[var(--error)]/8 flex items-center px-[10px] text-[14px] gap-[10px] select-none cursor-pointer">
+                                                <XCircle size={16} className="text-[var(--error)]" />
+                                                <p className="opacity-[0.5] truncate w-[90px]">{projectMap[log.projectId] || "Project"}</p>
+                                                <ChevronRight size={14} className="opacity-[0.7]" />
+                                                <p className="opacity-[0.9] flex-1 truncate">{log.logSummary}</p>
+                                                <p className="opacity-[0.8] text-[12px] pr-[4px]" suppressHydrationWarning>
+                                                    {new Date(log.timestamp).toLocaleTimeString([], { hour: 'numeric' })}
+                                                </p>
+                                            </div>
+                                        ))}
+                                        <Link href="/dashboard/logs">
+                                            <Button className="w-full h-[30px] text-[12px]" variant="ghost">More</Button>
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <div className="h-[100px] bg-[var(--success)]/5 rounded-[4px] flex items-center justify-center border-[2px] border-[var(--success)]/10 gap-[10px]">
+                                        <p className="text-[14px] leading-[1em]">
+                                            No alerts so far
+                                        </p>
+                                        <CheckCircle size={16} className="text-[var(--success)]" />
+                                    </div>
+                                )}
 
                             </div>
                         </div>
@@ -65,30 +82,35 @@ export default async function Dashboard() {
                             <Label className="pl-[5px]">Recent</Label>
                             <div className="rounded-[6px] border-border/40 border w-full mt-[10px] bg-muted dark:bg-muted/80 text-[14px] p-[4px] flex flex-col gap-[4px]">
 
-                                {/* <div className="h-[50px] rounded-[2px] border flex items-center px-[10px] text-[14px] gap-[10px] border-[var(--error)]/18 bg-[var(--error)]/8">
-                                    <XCircle size={16} className="text-[var(--error)]" />
-                                    <p className="opacity-[0.7] truncate flex-1">Projecaedomain.com/api/something/something</p>
-                                    <div>
-                                        <p className="text-[12px] text-[var(--error)]/90 bg-[var(--error)]/30 rounded-[10px] leading-[1em] py-[4px] px-[8px]">Timeout</p>
+                                {recentLogs.length > 0 ? (
+                                    <>
+                                        {recentLogs.map((log: any, index: number) => (
+                                            <div key={index} className={`h-[50px] rounded-[2px] border flex items-center px-[10px] text-[14px] gap-[10px]  select-none cursor-pointer ${log.status === "OK" ? "border-[var(--success)]/18 bg-[var(--success)]/8" : "border-[var(--error)]/18 bg-[var(--error)]/8"}`}>
+                                                {log.status === "OK" ? (
+                                                    <CheckCircle size={16} className="text-[var(--success)]/80" />
+                                                ) : (
+                                                    <XCircle size={16} className="text-[var(--error)]" />
+                                                )}
+                                                <p className="opacity-[0.7] truncate flex-1">{log.url}</p>
+                                                <div>
+                                                    <p className={`text-[12px] ${log.status === "OK" ? "text-[var(--success)] bg-[var(--success)]/30" : "text-[var(--error)]/90 bg-[var(--error)]/30"} rounded-[10px] leading-[1em] py-[4px] px-[8px]`}>
+                                                        {log.status === "OK" ? `${log.statusCode} ok` : log.status}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <Link href="/dashboard/logs">
+                                            <Button className="w-full h-[30px] text-[12px]" variant="ghost">More</Button>
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <div className="h-[100px] opacity-[0.8] rounded-[4px] flex items-center justify-center gap-[10px]">
+                                        <p className="text-[14px] leading-[1em]">
+                                            No recent pings
+                                        </p>
+                                        <PackageOpen size={18} />
                                     </div>
-                                </div>
-                                <div className="h-[50px] rounded-[2px] border flex items-center px-[10px] text-[14px] gap-[10px] border-[var(--success)]/18 bg-[var(--success)]/8">
-                                    <CheckCircle size={16} className="text-[var(--success)]/80" />
-                                    <p className="opacity-[0.7] truncate flex-1">Projecaedomain.com/api/something/something</p>
-                                    <div>
-                                        <p className="text-[12px] text-[var(--success)] bg-[var(--success)]/30 rounded-[10px] leading-[1em] py-[4px] px-[8px]">200 ok</p>
-                                    </div>
-                                </div>
-
-
-                                <Button className="w-full h-[30px] text-[12px]" variant="ghost">More</Button> */}
-
-                                <div className="h-[100px] opacity-[0.8] rounded-[4px] flex items-center justify-center gap-[10px]">
-                                    <p className="text-[14px] leading-[1em]">
-                                        No recent pings
-                                    </p>
-                                    <PackageOpen size={18} />
-                                </div>
+                                )}
                             </div>
 
                         </div>

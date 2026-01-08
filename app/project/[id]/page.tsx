@@ -41,7 +41,7 @@ export default function ProjectPage() {
         { label: "Status", value: getStatusLabel(projectData.overallStatus) },
         { label: "Endpoints", value: `${endpoints.filter(e => e.enabled).length} Active` },
         { label: "Avg Latency", value: `${avgLatency} ms` },
-        { label: "Frequency", value: `Avg ${avgInterval}m` },
+        { label: "Interval", value: `${avgInterval} m` },
     ]
 
     const handlePingAll = async () => {
