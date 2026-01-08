@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export default function LandingPage() {
     return (
-        <div className="h-[100vh] w-[100%] flex flex-col gap-[20px] justify-center items-center py-[30px]">
+        <div className="min-h-[100vh] md:gap-0 w-[100%] flex flex-col gap-[20px] justify-center items-center py-[30px]">
 
             <h1 className="text-[45px] md:text-[60px] font-[500] leading-[1.2em] text-[center]">NEVER LET</h1>
             <h1 className="text-[45px] md:text-[50px] font-[500] leading-[1.2em] text-[center]">YOUR SERVERS</h1>
