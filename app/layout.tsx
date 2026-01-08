@@ -34,13 +34,14 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased relative `}
         >
           <ThemeProvider attribute="class">
 
             <Toaster richColors position="top-center" />
             {children}
             <FooterComponent />
+
 
           </ThemeProvider>
         </body>

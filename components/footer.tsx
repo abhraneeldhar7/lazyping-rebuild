@@ -1,46 +1,49 @@
-import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
-import { auth } from "@clerk/nextjs/server";
-import { Button } from "./ui/button";
+import Link from "next/link";
 
-export default async function FooterComponent() {
-    const { userId } = await auth();
+export default function FooterComponent() {
 
     return (
-        <footer className="h-[50vh] w-full flex md:p-[30px] p-[15px] bg-muted dark:bg-muted/70 flex-col justify-between">
-            <div className="flex justify-between">
-                {userId ?
-                    <Image src="/appLogo.png" alt="" height={30} width={30} className="object-contain w-[40px] h-[40px]" /> :
-                    <Link href="/login" className="">
-                        <Button variant="shinny">Login</Button>
-                    </Link>
-                }
+        <footer className="h-[50vh] w-full flex  bg-foreground/2 flex-col justify-between text-[15px]">
 
-                <AnimatedThemeToggler />
-
-            </div>
-
-
-            <h1 className="text-[24px] font-[600] text-center">Lazy Ping</h1>
-
-            <div className="flex justify-between">
-
-                <div className="flex flex-col gap-[6px] text-[15px]">
-                    <Link href="https://veryneel.vercel.app" target="_blank" className="flex gap-[6px] items-center">
-                        Contact
-                        <ArrowUpRight size={15} />
-                    </Link>
-                    <Link href="https://x.com/veryNeel" target="_blank" className="flex gap-[6px] items-center">
-                        Twitter
-                        <ArrowUpRight size={15} />
-                    </Link>
+            <div className="md:p-[30px] p-[15px] flex justify-between gap-[50px] md:flex-row flex-col">
+                <div className="flex-2">
+                    <div className="flex items-center gap-[15px]">
+                        <Image src="/appLogo.png" height={28} width={28} alt="" />
+                        <h1>LazyPing</h1>
+                    </div>
+                    <p className="mt-[15px] max-w-[300px] opacity-[0.8] text-[14px]">LazyPing is a service which pings servers and alerts outages before users notice.</p>
                 </div>
 
+                <div className="flex flex-col gap-[10px] md:text-right flex-1">
+                    <Link href="/privacy-policy">Privacy Policy</Link>
+                    <Link href="/contact-us">Contact</Link>
+                    <Link href="/blogs">Blogs</Link>
 
-                <Image src="/antkinLogo.png" alt="" height={30} width={30} className="object-contain w-[40px] h-[40px] dark:invert" />
+                </div>
+
             </div>
+
+            <div className="relative overflow-hidden md:h-[10vw] h-[30vw]">
+                <div className="absolute bottom-0 translate-y-[32%] left-0 right-0">
+                    <div className="relative flex justify-center items-baseline">
+                        <h1 className="md:text-[10vw] text-[30vw] flex items-baseline">
+                            <span>Antk</span>
+                            <span className="relative inline-block">
+                                i
+                                <span className="absolute left-1/2 -translate-x-1/2 top-[0.2em] bg-foreground rounded-full text-background p-[4px] h-[0.3em] w-[0.3em] flex items-center justify-center">
+                                    <AnimatedThemeToggler />
+                                </span>
+                            </span>
+                            <span>n</span>
+                        </h1>
+                        <div className="md:h-[8vw] h-[27vw] bg-gradient-to-t from-background from-[50%] to-transparent to-[100%] absolute bottom-[-4px] z-[2] w-full" />
+                    </div>
+                </div>
+            </div>
+
+
         </footer>
     )
 }

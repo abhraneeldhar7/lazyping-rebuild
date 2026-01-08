@@ -15,11 +15,11 @@ export default async function DashboardLayout({
         <div className="relative overflow-hidden">
             <div className="rounded-[50%] w-[120%] h-[20vh] left-[50%] translate-x-[-50%] absolute top-[-15vh] bg-primary dark:bg-primary/80 z-[-1] opacity-[0.4] blur-[80px] animate-pulse" />
 
-            <div className="fixed top-0 bg-background z-[10] w-full border-b-[1px] border-foreground/20 h-[50px] flex items-center p-[5px] px-[10px] gap-[15px]">
+            <div className="fixed top-0 bg-background z-[10] w-full border-b-[1px] border-foreground/20 h-[50px] flex items-center p-[5px] px-[10px] gap-[12px]">
                 <Link href="/dashboard">
-                    <Image src="/appLogo.png" alt="" height={30} width={30} unoptimized />
+                    <Image src="/appLogo.png" alt="" height={25} width={25} unoptimized />
                 </Link>
-                <ChevronRight size={14} className="opacity-[0.3]" />
+                <ChevronRight size={15} className="opacity-[0.3]" />
                 <DashboardTitle />
                 <div className="ml-auto">
                     <UserPopoverComponent />

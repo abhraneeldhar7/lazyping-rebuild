@@ -1,8 +1,10 @@
-dashboard settings page
+    dashboard settings page
 public pages
 footer component
 api endpoint
 blogs
+about
+contact
 privacy policy
 
 add top 5 logs to endpoint page and add ping button.
