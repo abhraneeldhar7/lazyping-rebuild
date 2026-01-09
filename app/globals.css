@@ -64,7 +64,7 @@
 .dark {
   --error: #fa1818;
   --success: #06f291;
-  --background: oklch(0.2046 0 0);
+  --background: #0a0a0a;
   --foreground: oklch(0.9219 0 0);
   --card: oklch(0.2686 0 0);
   --card-foreground: oklch(0.9219 0 0);
@@ -167,13 +167,33 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 body {
   letter-spacing: var(--tracking-normal);
 }
-
-
 
 @layer base {
   * {
@@ -191,7 +211,6 @@ body {
   mix-blend-mode: normal;
 }
 
-
 html {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -204,4 +223,9 @@ html::-webkit-scrollbar {
 ::selection {
   background-color: var(--primary);
   color: var(--foreground)
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.ttf') format('truetype');
 }
