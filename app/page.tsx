@@ -136,14 +136,14 @@ export default function Page() {
                 <LogsThing />
             </div>
 
-            <div className="md:flex-3 flex flex-col relative items-center justify-between h-[400px] md:h-[500px]" >
+            <div className="md:flex-3 flex flex-col relative items-center justify-between h-[400px] md:h-[500px] overflow-hidden" >
                 <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center  gap-[12px] bg-muted shadow-md">
                     <div className="bg-[var(--success)] h-[7px] w-[7px] rounded-[50%] animate-pulse" />
                     3000 pings so far
                 </div>
 
                 <div className="z-[3] absolute bottom-[10%] flex flex-col gap-[20px] items-center">
-                    <p className="text-[white]">Works with <span className="font-[600]">every </span>framework</p>
+                    <p className="text-white mix-blend-difference">Works with <span className="font-[600]">every </span>framework</p>
 
                     <div className="relative">
                         <div className="h-full w-[60px] absolute left-0 bg-gradient-to-r from-background from-[20%] to-transparent z-[2]" />
