@@ -129,20 +129,45 @@ export default function Page() {
             </Marquee>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-[60px] mx-auto  md:px-[40px] w-full md:mt-[100px] mt-[50px] md:justify-between">
+        <div className="flex flex-col md:flex-row gap-[60px] mx-auto  md:px-[40px] w-full md:mt-[100px] mt-[50px] md:justify-between max-w-[1400px]">
 
             <div className="md:flex-2 flex flex-col gap-[50px] md:gap-[70px] max-w-[520px]">
                 <ChartsThing />
                 <LogsThing />
             </div>
 
-            <div className="md:flex-3 flex flex-col relative items-center h-[400px] md:h-[500px]" >
-                <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center gap-[12px]">
+            <div className="md:flex-3 flex flex-col relative items-center justify-between h-[400px] md:h-[500px]" >
+                <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center  gap-[12px] bg-muted shadow-md">
                     <div className="bg-[var(--success)] h-[7px] w-[7px] rounded-[50%] animate-pulse" />
                     3000 pings so far
                 </div>
 
-                <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0" alt="" unoptimized />
+                <div className="z-[3] absolute bottom-[10%] flex flex-col gap-[20px] items-center">
+                    <p className="text-[white]">Works with <span className="font-[600]">every </span>framework</p>
+
+                    <div className="relative">
+                        <div className="h-full w-[60px] absolute left-0 bg-gradient-to-r from-background from-[20%] to-transparent z-[2]" />
+                        <div className="h-full w-[60px] absolute right-0 bg-gradient-to-l from-background from-[20%] to-transparent z-[2]" />
+
+                        <Marquee className="[--duration:20s] max-w-[400px] w-full">
+                            <div className="px-[10px]">
+                                <Image alt="" src="/landingpage/serverFrameworks/expressjs.png" height={40} width={40} />
+                            </div>
+                            <div className="px-[10px]">
+                                <Image alt="" src="/landingpage/serverFrameworks/fastapi.svg" height={40} width={40} />
+                            </div>
+                            <div className="px-[10px]">
+                                <Image alt="" src="/landingpage/serverFrameworks/goLogo.png" height={40} width={40} />
+                            </div>
+                            <div className="px-[10px]">
+                                <Image alt="" src="/landingpage/serverFrameworks/nestJS.svg" height={40} width={40} />
+                            </div>
+                        </Marquee>
+                    </div>
+                </div>
+
+
+                <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0 translate-x-[-10px]" alt="" unoptimized />
                 <div className="h-[60px] w-full absolute bottom-0 bg-gradient-to-t from-background from-[0%] to-transparent to-[100%] z-[2]" />
 
             </div>
