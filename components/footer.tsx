@@ -16,7 +16,7 @@ export default function FooterComponent() {
                     <p className="mt-[15px] max-w-[300px] opacity-[0.8] text-[14px]">LazyPing is a service which pings servers and alerts outages before users notice.</p>
                 </div>
 
-                <div className="flex flex-col gap-[10px] md:text-right">
+                <div className="flex flex-col gap-[10px] md:text-right md:items-end">
                     <Link className="w-fit" href="/privacy-policy">Privacy Policy</Link>
                     <Link className="w-fit" href="/contact-us">Contact</Link>
                     <Link className="w-fit" href="/blogs">Blogs</Link>

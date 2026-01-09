@@ -131,7 +131,7 @@ export default function Page() {
 
         <div className="flex flex-col md:flex-row gap-[60px] mx-auto  md:px-[40px] w-full md:mt-[100px] mt-[50px] md:justify-between max-w-[1400px]">
 
-            <div className="md:flex-2 flex flex-col gap-[50px] md:gap-[70px] max-w-[520px]">
+            <div className="md:flex-2 flex flex-col gap-[60] max-w-[520px]">
                 <ChartsThing />
                 <LogsThing />
             </div>
@@ -142,8 +142,11 @@ export default function Page() {
                     3000 pings so far
                 </div>
 
-                <div className="z-[3] absolute bottom-[10%] flex flex-col gap-[20px] items-center">
-                    <p className="text-white mix-blend-difference">Works with <span className="font-[600]">every </span>framework</p>
+                <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0" alt="" unoptimized />
+                <div className="h-[60px] w-full absolute bottom-0 bg-gradient-to-t from-background from-[0%] to-transparent to-[100%] z-[2]" />
+
+                <div className="absolute bottom-[10%] flex flex-col gap-[20px] items-center">
+                    <p className="text-[white] mix-blend-difference text-[20px]">Works with <span className="font-[600]">every </span>framework</p>
 
                     <div className="relative">
                         <div className="h-full w-[60px] absolute left-0 bg-gradient-to-r from-background from-[20%] to-transparent z-[2]" />
@@ -165,11 +168,6 @@ export default function Page() {
                         </Marquee>
                     </div>
                 </div>
-
-
-                <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0 translate-x-[-10px]" alt="" unoptimized />
-                <div className="h-[60px] w-full absolute bottom-0 bg-gradient-to-t from-background from-[0%] to-transparent to-[100%] z-[2]" />
-
             </div>
 
         </div>
