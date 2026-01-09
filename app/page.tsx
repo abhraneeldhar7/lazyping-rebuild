@@ -13,7 +13,7 @@ export default function Page() {
     const smallMarqueeList = ["Anti Sleep", "Performance Tracker", "Down Detector", "Public status page", "Latency tracker", "Alert Integrations"]
 
 
-    return <div className="relative min-h-[140vh] pb-[50px] font-[Satoshi]">
+    return <div className="relative pb-[50px] font-[Satoshi]">
 
         <div className="h-[50px] backdrop-blur-[30px] fixed top-0 left-0 w-full z-[10] flex items-center px-[15px] justify-between">
             <Link href="/" className="md:hidden">
@@ -129,14 +129,23 @@ export default function Page() {
             </Marquee>
         </div>
 
-        <div className="flex flex-col md:flex-row md:gap-[60px] gap-[35px] mx-auto max-w-[900px] md:px-[20px] w-full md:mt-[100px] mt-[50px]">
+        <div className="flex flex-col md:flex-row gap-[60px] mx-auto  md:px-[40px] w-full md:mt-[100px] mt-[50px] md:justify-between">
 
-            <div className="flex flex-col gap-[50px] md:gap-[70px]">
+            <div className="md:flex-2 flex flex-col gap-[50px] md:gap-[70px] max-w-[520px]">
                 <ChartsThing />
                 <LogsThing />
             </div>
 
-            <div className=""></div>
+            <div className="md:flex-3 flex flex-col relative items-center h-[400px] md:h-[500px]" >
+                <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center gap-[12px]">
+                    <div className="bg-[var(--success)] h-[7px] w-[7px] rounded-[50%] animate-pulse" />
+                    3000 pings so far
+                </div>
+
+                <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0" alt="" unoptimized />
+                <div className="h-[60px] w-full absolute bottom-0 bg-gradient-to-t from-background from-[0%] to-transparent to-[100%] z-[2]" />
+
+            </div>
 
         </div>
 
