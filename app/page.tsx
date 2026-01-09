@@ -1,4 +1,6 @@
 "use client"
+import ChartsThing from "@/components/landingpageComp/chartsThing";
+import LogsThing from "@/components/landingpageComp/logsThing";
 import { Button } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -11,7 +13,7 @@ export default function Page() {
     const smallMarqueeList = ["Anti Sleep", "Performance Tracker", "Down Detector", "Public status page", "Latency tracker", "Alert Integrations"]
 
 
-    return <div className="relative min-h-[140vh] font-[Satoshi]">
+    return <div className="relative min-h-[140vh] pb-[50px] font-[Satoshi]">
 
         <div className="h-[50px] backdrop-blur-[30px] fixed top-0 left-0 w-full z-[10] flex items-center px-[15px] justify-between">
             <Link href="/" className="md:hidden">
@@ -71,8 +73,8 @@ export default function Page() {
 
             <div className="absolute top-0 z-[-2] w-full h-[40vh]">
                 <div className="relative w-full h-full">
-                    <div className="opacity-[0.16] w-full h-full bg-background bg-[linear-gradient(to_right,var(--foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--foreground)_1px,transparent_1px)] bg-size-[30px_30px] blur-[1px]" />
-                    <div className="h-full w-full absolute bottom-0 bg-gradient-to-t from-background from-[15%] to-transparent z-[2]" />
+                    <div className="opacity-[0.15] dark:opacity-[0.08] w-full h-full bg-background bg-[linear-gradient(to_right,var(--foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--foreground)_1px,transparent_1px)] bg-size-[30px_30px]" />
+                    <div className="h-full w-full absolute bottom-0 bg-gradient-to-t from-background from-[30%] to-transparent z-[2]" />
                 </div>
             </div>
 
@@ -126,6 +128,18 @@ export default function Page() {
                 ))}
             </Marquee>
         </div>
+
+        <div className="flex flex-col md:flex-row md:gap-[60px] gap-[35px] mx-auto max-w-[900px] md:px-[20px] w-full md:mt-[100px] mt-[50px]">
+
+            <div className="flex flex-col gap-[50px] md:gap-[70px]">
+                <ChartsThing />
+                <LogsThing />
+            </div>
+
+            <div className=""></div>
+
+        </div>
+
 
 
     </div>

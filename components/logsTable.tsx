@@ -48,10 +48,10 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                 <TableHeader>
                     <TableRow className="opacity-[0.6] text-[12px]">
                         <TableHead className="min-w-[180px]">URL</TableHead>
-                        <TableHead className="w-[80px] hidden sm:table-cell">Method</TableHead>
+                        <TableHead className="w-[80px] sm:table-cell">Method</TableHead>
                         <TableHead className="w-[140px]">Status</TableHead>
-                        <TableHead className="w-[70px] hidden md:table-cell">Code</TableHead>
-                        <TableHead className="w-[90px] hidden lg:table-cell">Latency</TableHead>
+                        <TableHead className="w-[70px] md:table-cell">Code</TableHead>
+                        <TableHead className="w-[90px] lg:table-cell">Latency</TableHead>
                         <TableHead className="w-[100px] text-right">Time</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -86,7 +86,7 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                                     })()}
                                 </div>
                             </TableCell>
-                            <TableCell className="w-[80px] hidden sm:table-cell">{log.method}</TableCell>
+                            <TableCell className="w-[80px] sm:table-cell">{log.method}</TableCell>
 
                             <TableCell className="w-[140px]">
                                 {log.status === "OK" ?
@@ -98,8 +98,8 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                                     </div>
                                 }
                             </TableCell>
-                            <TableCell className="w-[70px] hidden md:table-cell">{log.statusCode}</TableCell>
-                            <TableCell className="w-[90px] hidden lg:table-cell">{log.latencyMs}</TableCell>
+                            <TableCell className="w-[70px] md:table-cell">{log.statusCode}</TableCell>
+                            <TableCell className="w-[90px] lg:table-cell">{log.latencyMs}</TableCell>
                             <TableCell suppressHydrationWarning className="w-[100px] opacity-[0.7] text-right">{
                                 (new Date(log.timestamp)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                             }</TableCell>
