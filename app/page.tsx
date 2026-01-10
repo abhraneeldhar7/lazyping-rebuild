@@ -12,7 +12,7 @@ export default function RootPage() {
     const smallMarqueeList = ["Anti Sleep", "Performance Tracker", "Down Detector", "Public status page", "Latency tracker", "Alert Integrations"]
 
 
-    return <div className="relative pb-[50px] font-[Satoshi]">
+    return <div className="relative font-[Satoshi]">
 
         <div className="h-[50px] backdrop-blur-[30px] fixed top-0 left-0 w-full z-[10] flex items-center px-[15px] justify-between">
             <Link href="/" className="md:hidden">
@@ -171,6 +171,11 @@ export default function RootPage() {
 
         </div>
 
+        <div className="flex justify-center relative h-[55vh] md:h-[100vh] w-full mt-[80px] pt-[30px]">
+            <h1 className="md:absolute leading-[1.2em] top-[10%] left-[5%] md:text-[70px] text-[40px] text-center font-[600]">Public Status Page</h1>
+            <h1 className="absolute bottom-[10%] right-[5%] md:text-[50px] text-[30px] text-right font-[600] z-[2]">Never keep users guessing</h1>
+            <Image src="/landingpage/mockup.png" height={500} width={500} className="absolute bottom-0 h-[85%] object-bottom object-contain w-fit" alt="" unoptimized />
+        </div>
 
 
     </div>

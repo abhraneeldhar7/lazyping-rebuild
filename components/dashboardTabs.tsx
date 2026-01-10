@@ -11,8 +11,8 @@ export default function DashboardTabs() {
         { label: "Overview", href: "/dashboard" },
         { label: "Public Pages", href: "/dashboard/public-pages" },
         { label: "Logs", href: "/dashboard/logs" },
-        { label: "Integrations", href: "/integrations" },
-        { label: "Settings", href: "/dashboard/settings" },
+        // { label: "Integrations", href: "/integrations" },
+        // { label: "Settings", href: "/dashboard/settings" },
     ]
 
     return (

@@ -2,7 +2,7 @@
 import { getDB } from "@/lib/db"
 import { PublicPageType } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
-import { getProjectDetails } from "./projectActions";
+import { getAllUserProjectLogs, getProjectDetails, getProjects } from "./projectActions";
 import { revalidatePath } from "next/cache";
 
 const RESERVED_SLUGS = [
@@ -189,4 +189,14 @@ export async function togglePublicPageStatus(projectId: string, enabled: boolean
     revalidatePath(`/project/${projectId}/public-page`);
     revalidatePath(`/${publicPage.pageSlug}`);
     return { success: true };
+}
+
+export default async function getAllPublicPages() {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const db = await getDB();
+    const projects = await getProjects();
+    const publicPages = await db.collection("public-page").find({ projectId: { $in: projects.map((p) => p.projectId) } }).toArray();
+    return JSON.parse(JSON.stringify(publicPages));
 }
