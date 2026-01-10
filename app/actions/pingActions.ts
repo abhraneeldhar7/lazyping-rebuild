@@ -2,6 +2,8 @@
 import { EndpointType, PingLog, ProjectType } from "@/lib/types";
 import { getEndpointDetails } from "./endpointActions";
 import { getDB } from "@/lib/db";
+import redis from "@/lib/redis";
+import { deserialize, serialize } from "@/lib/utils";
 
 // Thresholds
 const LATENCY_DEGRADED_THRESHOLD = 2000; // ms
@@ -236,18 +238,53 @@ export async function pingEndpoint(
         }
     );
 
+    // Update Redis
+    // Fetch latest from connection to ensure we preserve fields like Name/Body that might have changed
+    const freshEndpointData = await deserialize<EndpointType>(await redis.get(`endpoint:${endpoint.endpointId}`)) || endpoint;
+
+    const updatedEndpointObj = {
+        ...freshEndpointData,
+        currentStatus: actualNewStatus,
+        latency: log.latencyMs,
+        lastPingedAt: log.timestamp,
+        nextPingAt: new Date(Date.now() + endpoint.intervalMinutes * 60000),
+        consecutiveFailures: newConsecutiveFailures,
+        ...(statusChanged && { lastStatusChange: log.timestamp })
+    };
+    await redis.set(`endpoint:${endpoint.endpointId}`, serialize(updatedEndpointObj));
+
     // 9. Update Project status (only if endpoint status changed)
     if (statusChanged) {
-        const allEndpoints = await db.collection("endpoints")
-            .find({ projectId: endpoint.projectId })
-            .toArray();
+        // Optimisation: Fetch endpoints from Redis to calculate status
+        let updatedEndpoints: any[] = [];
 
-        // Update the current endpoint in the array with new status
-        const updatedEndpoints = allEndpoints.map((e: any) =>
+        // Try getting from Redis first
+        const endpointIds = await redis.smembers(`project:${endpoint.projectId}:endpoints`);
+        if (endpointIds.length > 0) {
+            const keys = endpointIds.map(id => `endpoint:${id}`);
+            const cached = await redis.mget(keys);
+            updatedEndpoints = cached
+                .map(e => deserialize<EndpointType>(e))
+                .filter(e => e !== null);
+        }
+
+        // Fallback to DB if cache empty (or partial?)
+        if (updatedEndpoints.length === 0) {
+            updatedEndpoints = await db.collection("endpoints")
+                .find({ projectId: endpoint.projectId })
+                .toArray();
+        }
+
+        // Just in case the *current* endpoint update hasn't propagated or we fetched stale data (if we fetched before the update above completed technically, but we just updated Redis)
+        // Actually, we just updated Redis for *this* endpoint above. So if we fetch from Redis, we get the NEW status.
+        // If we fetched from DB, we might NOT get the new status if the write hasn't settled (mongo eventual consistency?), but usually Read-after-Write in same session is fine?
+        // To be safe, let's manually splice the new status into the array.
+        updatedEndpoints = updatedEndpoints.map((e: any) =>
             e.endpointId === endpoint.endpointId
-                ? { ...e, currentStatus: actualNewStatus }
+                ? { ...e, currentStatus: actualNewStatus } // Ensure current one is correct
                 : e
         );
+
 
         // Calculate project status
         const downCount = updatedEndpoints.filter((e: any) => e.currentStatus === "DOWN").length;
@@ -256,7 +293,7 @@ export async function pingEndpoint(
 
         let projectStatus: ProjectType['overallStatus'] = "OPERATIONAL";
 
-        if (downCount === totalCount) {
+        if (downCount === totalCount && totalCount > 0) {
             projectStatus = "MAJOR_OUTAGE";
         } else if (downCount > 0) {
             projectStatus = "PARTIAL_OUTAGE";
@@ -268,6 +305,14 @@ export async function pingEndpoint(
             { projectId: endpoint.projectId },
             { $set: { overallStatus: projectStatus } }
         );
+
+        // Update Project in Redis
+        // We need the full project object.
+        const project = await deserialize<ProjectType>(await redis.get(`project:${endpoint.projectId}`));
+        if (project) {
+            project.overallStatus = projectStatus;
+            await redis.set(`project:${endpoint.projectId}`, serialize(project));
+        }
     }
 
     return JSON.parse(JSON.stringify(log));

@@ -5,6 +5,8 @@ import { PingLog, ProjectType } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
+import redis from "@/lib/redis";
+import { deserialize, serialize } from "@/lib/utils";
 
 export async function createProject(data: {
     projectName: string;
@@ -30,6 +32,11 @@ export async function createProject(data: {
 
     await db.collection("projects").insertOne(newProject);
 
+    // Cache: Set project data and add to user's project list
+    await redis.set(`project:${newProject.projectId}`, serialize(newProject));
+    await redis.sadd(`user:${userId}:projects`, newProject.projectId);
+
+
     revalidatePath("/dashboard");
     return JSON.parse(JSON.stringify({ success: true, project: newProject }));
 }
@@ -42,10 +49,41 @@ export async function getProjects() {
     if (!userId) throw new Error("Unauthorized");
 
     const db = await getDB();
-    const projects = await db.collection("projects")
-        .find({ ownerId: userId }, { projection: { _id: 0 } })
-        .sort({ createdAt: -1 })
-        .toArray() as ProjectType[] | [];
+
+    // 1. Get Project IDs from Set (Try Cache)
+    let projectIds = await redis.smembers(`user:${userId}:projects`);
+    let projects: ProjectType[] = [];
+
+    if (projectIds.length > 0) {
+        const projectKeys = projectIds.map(id => `project:${id}`);
+        const cachedProjects = await redis.mget(projectKeys);
+        projects = cachedProjects
+            .map(p => deserialize<ProjectType>(p))
+            .filter((p): p is ProjectType => p !== null);
+
+        // Sort by createdAt desc (in-memory)
+        projects.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        if (projects.length !== projectIds.length) {
+            projects = []; // mismatch, fetch from DB
+        }
+    }
+
+    if (projects.length === 0) {
+        projects = await db.collection("projects")
+            .find({ ownerId: userId }, { projection: { _id: 0 } })
+            .sort({ createdAt: -1 })
+            .toArray() as ProjectType[] | [];
+
+        // Populate Cache
+        if (projects.length > 0) {
+            const pipeline = redis.pipeline();
+            const ids = projects.map(p => p.projectId);
+            pipeline.sadd(`user:${userId}:projects`, ...ids);
+            projects.forEach(p => pipeline.set(`project:${p.projectId}`, serialize(p)));
+            await pipeline.exec();
+        }
+    }
 
     return projects;
 
@@ -65,6 +103,19 @@ export async function deleteProject(projectId: string) {
     await db.collection("logs").deleteMany({ projectId: projectId });
     await db.collection("public-page").deleteMany({ projectId: projectId });
 
+    // Invalidate Cache
+    await redis.del(`project:${projectId}`);
+    await redis.srem(`user:${userId}:projects`, projectId);
+
+    // Cleanup endpoints for this project
+    const endpointIds = await redis.smembers(`project:${projectId}:endpoints`);
+    if (endpointIds.length > 0) {
+        const pipeline = redis.pipeline();
+        endpointIds.forEach(eid => pipeline.del(`endpoint:${eid}`));
+        pipeline.del(`project:${projectId}:endpoints`);
+        await pipeline.exec();
+    }
+
     revalidatePath("/dashboard");
 }
 
@@ -78,12 +129,34 @@ export async function saveProject(projectData: ProjectType) {
             projectName: projectData.projectName
         }
     });
+
+    // Update Cache
+    // We need to fetch the existing generic or just update the field?
+    // Let's fetch the cached one to preserve other fields
+    const cachedProject: any = await deserialize(await redis.get(`project:${projectData.projectId}`));
+    if (cachedProject) {
+        cachedProject.projectName = projectData.projectName;
+        await redis.set(`project:${projectData.projectId}`, serialize(cachedProject));
+    } else {
+        // If not in cache, we assume next read will populate it, 
+        // OR we can fetch from DB again. Let's leave it to expire/refetch if not present.
+    }
     revalidatePath(`/project/${projectData.projectId}`);
 }
 
 export async function getProjectDetails(projectId: string) {
     const db = await getDB();
+
+    // Try Cache
+    const cachedProject = await deserialize<ProjectType>(await redis.get(`project:${projectId}`));
+    if (cachedProject) return cachedProject;
+
     const project = await db.collection("projects").findOne({ projectId: projectId }, { projection: { _id: 0 } }) as ProjectType | null;
+
+    if (project) {
+        await redis.set(`project:${projectId}`, serialize(project));
+    }
+
     return project;
 }
 
@@ -141,6 +214,20 @@ export async function pauseProject(projectId: string) {
     if (!project) throw new Error("Unauthorized");
 
     await db.collection("endpoints").updateMany({ projectId: projectId }, { $set: { enabled: false } });
+
+    // Update Cache for all endpoints
+    const endpointIds = await redis.smembers(`project:${projectId}:endpoints`);
+    const pipeline = redis.pipeline();
+    for (const eid of endpointIds) {
+        // We need to read-modify-write technically, but since we know we are setting enabled: false
+        // We can try to use a Lua script or just async update.
+        // For simplicity: We will just delete the keys to force re-fetch from DB (which is updated)
+        // Or better: load, update, save.
+        pipeline.get(`endpoint:${eid}`); // This is async inside pipeline... pipeline doesn't work like this for logic.
+        // Simple invalidation strategy is best here for bulk updates
+        pipeline.del(`endpoint:${eid}`);
+    }
+    await pipeline.exec();
 
     revalidatePath(`/project/${projectId}`);
 }

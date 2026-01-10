@@ -6,6 +6,8 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
 import { pingEndpoint } from "./pingActions";
+import redis from "@/lib/redis";
+import { deserialize, serialize } from "@/lib/utils";
 
 /**
  * Adds a monitored endpoint to a project
@@ -48,6 +50,11 @@ export async function createEndpoint(data: {
     };
 
     await db.collection("endpoints").insertOne(newEndpoint);
+
+    // Cache: Set endpoint data and add to project's endpoint list
+    await redis.set(`endpoint:${newEndpoint.endpointId}`, serialize(newEndpoint));
+    await redis.sadd(`project:${data.projectId}:endpoints`, newEndpoint.endpointId);
+
     await pingEndpoint(newEndpoint.endpointId)
     revalidatePath(`/project/${data.projectId}`);
     return (newEndpoint.endpointId)
@@ -58,12 +65,54 @@ export async function getEndpoints(projectId: string) {
     const db = await getDB();
     const { userId } = await auth().catch(() => ({ userId: null }));
 
-    const project = await db.collection("projects").findOne({ projectId: projectId });
+    // 1. Get Project (Try Cache)
+    let project: any = await deserialize(await redis.get(`project:${projectId}`));
+    if (!project) {
+        project = await db.collection("projects").findOne({ projectId: projectId });
+        if (project) await redis.set(`project:${projectId}`, serialize(project));
+    }
+
     if (!project) throw new Error("Project not found");
 
-    const endpoints = await db.collection<EndpointType>("endpoints")
-        .find({ projectId: projectId }, { projection: { _id: 0 } })
-        .toArray();
+    // 2. Get Endpoint IDs from Set (Try Cache)
+    let endpointIds = await redis.smembers(`project:${projectId}:endpoints`);
+    let endpoints: EndpointType[] = [];
+
+    if (endpointIds.length > 0) {
+        // Fetch values
+        const endpointKeys = endpointIds.map(id => `endpoint:${id}`);
+        // MGET returns (string | null)[]
+        const cachedEndpoints = await redis.mget(endpointKeys);
+
+        // Deserialize and filter out nulls
+        endpoints = cachedEndpoints
+            .map(e => deserialize<EndpointType>(e))
+            .filter((e): e is EndpointType => e !== null);
+
+        // If we found fewer endpoints than IDs (cache miss/eviction), fall back to DB or just fill gaps?
+        // Fallback to DB is safest for consistency if counts mismatch significantly, 
+        // but for now let's assume if IDs exist, we trust them or if null, we re-fetch all to heal.
+        if (endpoints.length !== endpointIds.length) {
+            // Cache likely inconsistent/evicted. Fetch all from DB.
+            endpoints = []; // trigger DB fetch
+        }
+    }
+
+    if (endpoints.length === 0) {
+        // Cache miss or empty
+        endpoints = await db.collection<EndpointType>("endpoints")
+            .find({ projectId: projectId }, { projection: { _id: 0 } })
+            .toArray();
+
+        // Populate Cache
+        if (endpoints.length > 0) {
+            const pipeline = redis.pipeline();
+            const ids = endpoints.map(e => e.endpointId);
+            pipeline.sadd(`project:${projectId}:endpoints`, ...ids);
+            endpoints.forEach(e => pipeline.set(`endpoint:${e.endpointId}`, serialize(e)));
+            await pipeline.exec();
+        }
+    }
 
     const isOwner = userId && userId === project.ownerId;
 
@@ -120,6 +169,15 @@ export async function updateEndpoint(data: EndpointType) {
             }
         }
     );
+
+    // Update Cache: Fetch latest from DB or Cache to ensure we don't overwrite concurrent changes
+    // Best practice: Fetch from DB (source of truth) to be sure, or fetch from Redis.
+    // Since we just wrote to DB, DB is the authority.
+    const freshEndpoint = await db.collection("endpoints").findOne({ endpointId: data.endpointId }, { projection: { _id: 0 } });
+    if (freshEndpoint) {
+        await redis.set(`endpoint:${data.endpointId}`, serialize(freshEndpoint));
+    }
+
     revalidatePath(`/project/${endpoint.projectId}`);
 }
 
@@ -128,11 +186,33 @@ export async function getEndpointDetails(id: string): Promise<EndpointType> {
     if (!userId) throw new Error("Unauthorized");
     const db = await getDB();
 
+    // Try Cache
+    const cachedEndpoint = await deserialize<EndpointType>(await redis.get(`endpoint:${id}`));
+    if (cachedEndpoint) {
+        const cachedProject: any = await deserialize(await redis.get(`project:${cachedEndpoint.projectId}`));
+        // If project not in cache, validation might fail, but let's check basic auth
+        // Use DB for auth check if cache missing
+        let project = cachedProject;
+        if (!project) {
+            project = await db.collection("projects").findOne({ projectId: cachedEndpoint.projectId, ownerId: userId });
+        } else if (project.ownerId !== userId) {
+            project = null; // invalid owner
+        }
+
+        if (project) {
+            return cachedEndpoint;
+        }
+    }
+
+
     const endpoint = await db.collection<EndpointType>("endpoints").findOne({ endpointId: id }, { projection: { _id: 0 } })
     if (!endpoint) throw new Error("Unauthorized");
 
     const project = await db.collection("projects").findOne({ projectId: endpoint.projectId, ownerId: userId })
     if (!project) throw new Error("Unauthorized");
+
+    // Populate Cache
+    await redis.set(`endpoint:${id}`, serialize(endpoint));
 
     return JSON.parse(JSON.stringify(endpoint));
 }
@@ -149,6 +229,11 @@ export async function deleteEndpoint(id: string) {
     if (!project) throw new Error("Unauthorized");
 
     await db.collection("endpoints").deleteOne({ endpointId: id })
+
+    // Invalidate Cache
+    await redis.del(`endpoint:${id}`);
+    await redis.srem(`project:${endpoint.projectId}:endpoints`, id);
+
     revalidatePath(`/project/${endpoint.projectId}`);
 }
 
@@ -165,5 +250,13 @@ export async function toggleEndpoint(endpoint: EndpointType) {
             }
         }
     );
+
+    // Update Cache
+    // Fetch latest to be safe
+    const freshEndpoint = await db.collection("endpoints").findOne({ endpointId: endpoint.endpointId }, { projection: { _id: 0 } });
+    if (freshEndpoint) {
+        await redis.set(`endpoint:${endpoint.endpointId}`, serialize(freshEndpoint));
+    }
+
     revalidatePath(`/project/${endpoint.projectId}/e/${endpoint.endpointId}`);
 }

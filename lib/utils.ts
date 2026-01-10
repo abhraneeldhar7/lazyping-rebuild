@@ -57,3 +57,23 @@ export function formatRelativeTime(date: Date | string | null): string {
   if (hours < 24) return `${hours}h ago`;
   return `${days}d ago`;
 }
+
+export function serialize(data: any): string {
+  return JSON.stringify(data);
+}
+
+export function deserialize<T>(data: string | null): T | null {
+  if (!data) return null;
+  return JSON.parse(data, (key, value) => {
+    // Attempt to convert ISO date strings back to Date objects
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) {
+      return new Date(value);
+    }
+    // Handle simplified ISO without milliseconds if necessary, though Date.toISOString() uses them.
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return value;
+  }) as T;
+}

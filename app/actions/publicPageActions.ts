@@ -4,6 +4,8 @@ import { PublicPageType } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { getAllUserProjectLogs, getProjectDetails, getProjects } from "./projectActions";
 import { revalidatePath } from "next/cache";
+import redis from "@/lib/redis";
+import { deserialize, serialize } from "@/lib/utils";
 
 const RESERVED_SLUGS = [
     "dashboard",
@@ -33,7 +35,18 @@ const RESERVED_SLUGS = [
 
 export async function getPublicPageFromID(projectId: string) {
     const db = await getDB();
+
+    // Try Cache
+    const cachedPage = await deserialize<PublicPageType>(await redis.get(`public-page-id:${projectId}`));
+    if (cachedPage) return cachedPage;
+
     const publicPage = await db.collection("public-page").findOne({ projectId });
+
+    if (publicPage) {
+        await redis.set(`public-page-id:${projectId}`, serialize(publicPage));
+        await redis.set(`public-page-slug:${publicPage.pageSlug}`, serialize(publicPage));
+    }
+
     return (JSON.parse(JSON.stringify(publicPage)))
 }
 
@@ -113,6 +126,11 @@ export async function createProjectPublicPage(projectId: string) {
     };
 
     const result = await db.collection("public-page").insertOne(newPublicPage);
+
+    // Cache
+    await redis.set(`public-page-id:${projectId}`, serialize(newPublicPage));
+    await redis.set(`public-page-slug:${slug}`, serialize(newPublicPage));
+
     revalidatePath(`/project/${projectId}/public-page`);
     return JSON.parse(JSON.stringify(newPublicPage));
 }
@@ -155,10 +173,22 @@ export async function savePublicPage(pageData: PublicPageType) {
         lastUpdated: new Date()
     };
 
+    const existingPage = await db.collection("public-page").findOne({ projectId: pageData.projectId });
+
     await db.collection("public-page").updateOne(
         { projectId: pageData.projectId },
         { $set: updateData }
     );
+
+    // Update Cache
+    // If slug changed, delete old slug key
+    if (existingPage && existingPage.pageSlug !== normalizedSlug) {
+        await redis.del(`public-page-slug:${existingPage.pageSlug}`);
+    }
+
+    const updatedPage = { ...existingPage, ...updateData };
+    await redis.set(`public-page-id:${pageData.projectId}`, serialize(updatedPage));
+    await redis.set(`public-page-slug:${normalizedSlug}`, serialize(updatedPage));
 
     revalidatePath(`/project/${pageData.projectId}/public-page`);
     revalidatePath(`/${normalizedSlug}`);
@@ -183,6 +213,11 @@ export async function togglePublicPageStatus(projectId: string, enabled: boolean
         { projectId },
         { $set: { enabled, lastUpdated: new Date() } }
     );
+
+    // Update Cache
+    const updatedPage = { ...publicPage, enabled, lastUpdated: new Date() };
+    await redis.set(`public-page-id:${projectId}`, serialize(updatedPage));
+    await redis.set(`public-page-slug:${publicPage.pageSlug}`, serialize(updatedPage));
 
     revalidatePath(`/project/${projectId}/public-page`);
     revalidatePath(`/${publicPage.pageSlug}`);
