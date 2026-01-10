@@ -1,10 +1,14 @@
-import { getAllUserProjectLogs } from "@/app/actions/projectActions";
-import LogsPageComponent from "@/components/logsComponent";
+import { Suspense } from "react";
+import { DashboardLogsWrapper } from "@/components/logs/logsWrapper";
+import { LogsPageSkeleton } from "@/components/loadingSkeletons";
 
 
 export default async function DashboardLogsPage() {
-    const logs = await getAllUserProjectLogs();
-    return (<div>
-        <LogsPageComponent logs={logs} />
-    </div>)
+    return (
+        <div>
+            <Suspense fallback={<LogsPageSkeleton />}>
+                <DashboardLogsWrapper />
+            </Suspense>
+        </div>
+    )
 }

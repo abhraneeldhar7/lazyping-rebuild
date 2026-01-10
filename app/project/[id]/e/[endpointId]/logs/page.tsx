@@ -1,10 +1,13 @@
-import { getEndpointLogs } from "@/app/actions/endpointActions";
-import LogsPageComponent from "@/components/logsComponent";
+import { Suspense } from "react";
+import { EndpointLogsWrapper } from "@/components/logs/logsWrapper";
+import { LogsPageSkeleton } from "@/components/loadingSkeletons";
 
 export default async function LogsPge({ params }: { params: Promise<{ endpointId: string }> }) {
-    const param = await params
-    const logs = await getEndpointLogs(param.endpointId)
+    const { endpointId } = await params;
+
     return (
-        <LogsPageComponent logs={logs} />
+        <Suspense fallback={<LogsPageSkeleton />}>
+            <EndpointLogsWrapper endpointId={endpointId} />
+        </Suspense>
     )
 }

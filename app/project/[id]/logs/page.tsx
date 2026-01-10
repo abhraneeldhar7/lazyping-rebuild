@@ -1,12 +1,15 @@
-import { getProjectLogs } from "@/app/actions/projectActions"
-import LogsPageComponent from "@/components/logsComponent"
+import { Suspense } from "react";
+import { ProjectLogsWrapper } from "@/components/logs/logsWrapper";
+import { LogsPageSkeleton } from "@/components/loadingSkeletons";
 
 export default async function ProjectLogsPage({ params }: { params: Promise<{ id: string }> }) {
     const projectId = (await params).id
-    const logs = await getProjectLogs(projectId)
+
     return (
         <div>
-            <LogsPageComponent logs={logs} />
+            <Suspense fallback={<LogsPageSkeleton />}>
+                <ProjectLogsWrapper projectId={projectId} />
+            </Suspense>
         </div>
     )
 }
