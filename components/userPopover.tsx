@@ -26,19 +26,19 @@ export function UserPopoverComponent() {
 
             </PopoverTrigger>
             <PopoverContent autoFocus={false} className="flex flex-col gap-[4px] p-[4px] w-[160px]">
-                <Link href="/profile">
+                {/* <Link href="/profile">
                     <PopoverClose className="w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]">
                         <UserRound size={14} />
                         Profile
                     </PopoverClose>
-                </Link>
+                </Link> */}
                 <Link href="/dashboard">
                     <PopoverClose className="w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]">
                         <LayoutGrid size={14} />
                         Dashboard
                     </PopoverClose>
                 </Link>
-                <PopoverClose className="text-[red] w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]" onClick={() => signOut({redirectUrl:"/login"})}>
+                <PopoverClose className="text-[red] w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]" onClick={() => signOut({ redirectUrl: "/login" })}>
                     <LogOutIcon size={14} />
                     Log out
                 </PopoverClose>
