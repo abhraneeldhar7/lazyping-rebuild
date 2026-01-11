@@ -2,7 +2,7 @@ name: Ping Endpoints
 
 on:
   schedule:
-    - cron: '* * * * *' # Every minute
+    - cron: '*/5 * * * *' # Every 5 minutes
   workflow_dispatch: # Allows manual trigger
 
 jobs:

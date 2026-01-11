@@ -47,10 +47,10 @@ export async function getViewerPublicPageData(slug: string) {
             logs: logs
         }));
     } catch (error: any) {
-        if (error.message === 'NEXT_NOT_FOUND' || error.digest === 'NEXT_NOT_FOUND') {
+        if (error.message === 'NEXT_NOT_FOUND' || error.digest === 'NEXT_NOT_FOUND' || error.message.includes('NEXT_HTTP_ERROR_FALLBACK')) {
             throw error;
         }
-        console.error("Error fetching viewer public page data:", error);
+        console.error(`Error fetching viewer public page data for slug [${slug}]:`, error);
         return { error: "An unexpected error occurred" };
     }
 }

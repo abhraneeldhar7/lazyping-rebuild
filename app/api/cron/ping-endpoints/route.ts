@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     try {
         // Fire and forget: Do not await this promise
-        processScheduledPings().catch((err) => {
+        await processScheduledPings().catch((err) => {
             console.error("Background ping process failed:", err);
         });
 
