@@ -36,19 +36,22 @@ const RESERVED_SLUGS = [
 export async function getPublicPageFromID(projectId: string) {
     const db = await getDB();
 
-    // Try Cache
-    const cachedPage = await deserialize<PublicPageType>(await redis.get(`public-page-id:${projectId}`));
-    if (cachedPage) return cachedPage;
+    // Try Cache (Slug dependent, but we only have ID here. Need lookup or just DB)
+    // To save space we removed ID cache. So we must query DB or Project->PublicPage mapping if we had one.
+    // For now, valid use case: We can just query DB since this is an admin/owner action usually.
+    // OR we can keep a lightweight ID->Slug mapping if needed. 
+    // But user asked to remove ID cache. So Query DB.
 
     const publicPage = await db.collection("public-page").findOne({ projectId });
 
     if (publicPage) {
-        await redis.set(`public-page-id:${projectId}`, serialize(publicPage));
+        // Cache by Slug when we fetch it
         await redis.set(`public-page-slug:${publicPage.pageSlug}`, serialize(publicPage));
     }
 
     return (JSON.parse(JSON.stringify(publicPage)))
 }
+
 
 function generateSlug(text: string): string {
     return text
@@ -128,7 +131,7 @@ export async function createProjectPublicPage(projectId: string) {
     const result = await db.collection("public-page").insertOne(newPublicPage);
 
     // Cache
-    await redis.set(`public-page-id:${projectId}`, serialize(newPublicPage));
+    // Cache only by Slug
     await redis.set(`public-page-slug:${slug}`, serialize(newPublicPage));
 
     revalidatePath(`/project/${projectId}/public-page`);
@@ -187,7 +190,7 @@ export async function savePublicPage(pageData: PublicPageType) {
     }
 
     const updatedPage = { ...existingPage, ...updateData };
-    await redis.set(`public-page-id:${pageData.projectId}`, serialize(updatedPage));
+    // Only cache by slug
     await redis.set(`public-page-slug:${normalizedSlug}`, serialize(updatedPage));
 
     revalidatePath(`/project/${pageData.projectId}/public-page`);
@@ -216,7 +219,7 @@ export async function togglePublicPageStatus(projectId: string, enabled: boolean
 
     // Update Cache
     const updatedPage = { ...publicPage, enabled, lastUpdated: new Date() };
-    await redis.set(`public-page-id:${projectId}`, serialize(updatedPage));
+    // Only cache by slug
     await redis.set(`public-page-slug:${publicPage.pageSlug}`, serialize(updatedPage));
 
     revalidatePath(`/project/${projectId}/public-page`);

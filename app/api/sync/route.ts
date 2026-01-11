@@ -4,9 +4,9 @@ import { serialize } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    // Optional: Add a secret key check header to prevent unauthorized syncing
-    // const authHeader = req.headers.get("x-sync-secret");
-    // if (authHeader !== process.env.SYNC_SECRET) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Add a secret key check header to prevent unauthorized syncing
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader !== `Bearer ${process.env.GITHUB_CRON_SECRET}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
         const db = await getDB();
@@ -27,9 +27,10 @@ export async function POST(req: Request) {
         }
 
         // 3. Sync Public Pages
+        // 3. Sync Public Pages
+        // We only cache by slug now to save space
         const publicPages = await db.collection("public-page").find({}).toArray();
         for (const pp of publicPages) {
-            pipeline.set(`public-page-id:${pp.projectId}`, serialize(pp));
             pipeline.set(`public-page-slug:${pp.pageSlug}`, serialize(pp));
         }
 

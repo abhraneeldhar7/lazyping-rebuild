@@ -53,11 +53,10 @@ export default function EndpointSettingsClientPage({ endpointDetails }: { endpoi
                 throw new Error("Network response was not ok");
             }
             const data = await response.json();
-            console.log(data)
             setTestResponse(JSON.stringify(data, null, 2));
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
         } finally {
             setLoadingTest(false);
         }

@@ -6,7 +6,7 @@ import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
 
 // Thresholds
-const LATENCY_DEGRADED_THRESHOLD = 2000; // ms
+const LATENCY_DEGRADED_THRESHOLD = 5000; // ms
 const CONSECUTIVE_FAILURES_THRESHOLD = 2;
 const TIMEOUT_MS = 10000; // 10 seconds
 
@@ -15,8 +15,8 @@ const TIMEOUT_MS = 10000; // 10 seconds
  * TODO: Implement actual GitHub issue creation
  */
 async function alertGithubIssue(endpoint: EndpointType, type: "DOWN" | "RECOVERED") {
-    // console.log(`[ALERT] ${type}: ${endpoint.url}`);
-    // TODO: Create GitHub issue via API
+    // Logic to create GitHub issue will be implemented here
+    // This will use the project's GitHub integration settings
 }
 
 /**

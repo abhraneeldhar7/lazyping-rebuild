@@ -9,9 +9,7 @@ import { pingEndpoint } from "./pingActions";
 import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
 
-/**
- * Adds a monitored endpoint to a project
- */
+
 export async function createEndpoint(data: {
     url: string;
     name: string;

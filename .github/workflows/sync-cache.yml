@@ -1,0 +1,15 @@
+name: Cache Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Every day at midnight UTC
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Sync API
+        run: |
+          curl -X POST ${{ secrets.NEXT_PUBLIC_APP_URL }}/api/sync \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_CRON_SECRET }}"
