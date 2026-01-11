@@ -185,6 +185,9 @@ export async function pingEndpoint(
     // 5. Insert log into database
     await db.collection('logs').insertOne(log);
 
+    // Increment total ping count
+    await redis.incr("system:total-pings");
+
     // 6. Apply Two-Strike Rule
     const isSuccess = newEndpointStatus === "UP" || newEndpointStatus === "DEGRADED";
     const previousStatus = endpoint.currentStatus;
@@ -324,4 +327,15 @@ export async function pingEndpoint(
     }
 
     return JSON.parse(JSON.stringify(log));
+}
+
+export async function getTotalPingCount() {
+    const cachedCount = await redis.get("system:total-pings");
+    if (cachedCount) return Number(cachedCount);
+
+    const db = await getDB();
+    const count = await db.collection("logs").estimatedDocumentCount();
+
+    await redis.set("system:total-pings", count);
+    return count;
 }

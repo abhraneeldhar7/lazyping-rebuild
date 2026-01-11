@@ -1,5 +1,6 @@
 import ChartsThing from "@/components/landingpageComp/chartsThing";
 import LogsThing from "@/components/landingpageComp/logsThing";
+import { PingsSoFar } from "@/components/landingpageComp/pingsSoFar";
 import { Button } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -139,8 +140,7 @@ export default function RootPage() {
 
             <div className="md:flex-3 flex flex-col relative items-center justify-between h-[400px] md:h-[500px] overflow-hidden" >
                 <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center  gap-[12px] bg-muted shadow-md">
-                    <div className="bg-[var(--success)] h-[7px] w-[7px] rounded-[50%] animate-pulse" />
-                    3000 pings so far
+                    <PingsSoFar />
                 </div>
 
                 <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0" alt="" unoptimized />

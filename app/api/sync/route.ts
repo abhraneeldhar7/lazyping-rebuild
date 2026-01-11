@@ -34,6 +34,10 @@ export async function POST(req: Request) {
             pipeline.set(`public-page-slug:${pp.pageSlug}`, serialize(pp));
         }
 
+        // 4. Sync Total Ping Count
+        const totalPings = await db.collection("logs").estimatedDocumentCount();
+        pipeline.set("system:total-pings", totalPings);
+
         await pipeline.exec();
 
         return NextResponse.json({
