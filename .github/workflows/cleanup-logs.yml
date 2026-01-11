@@ -1,0 +1,15 @@
+name: Cleanup Logs
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Every day at midnight
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cleanup Cron
+        run: |
+          curl -X POST ${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/cleanup \
+          -H "Authorization: Bearer ${{ secrets.HUB_CRON_SECRET }}"
