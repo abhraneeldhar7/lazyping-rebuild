@@ -1,6 +1,7 @@
 "use client"
 import { Area, AreaChart, XAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import { TextAnimate } from "../ui/text-animate";
 
 export default function ChartsThing() {
 
@@ -46,7 +47,9 @@ export default function ChartsThing() {
 
             <div className="relative w-full overflow-hidden" >
 
-                <h1 className="text-[40px] font-[500] absolute top-0 z-[-1] left-[50%] translate-x-[-50%] select-none cursor-pointer">More Data</h1>
+                <TextAnimate delay={0.2} animation="slideUp" className="text-[40px] font-[500] absolute top-0 z-[-1] left-[50%] translate-x-[-50%] select-none cursor-pointer" as="h1">
+                    More Data
+                </TextAnimate>
 
                 <div className="h-[250px] absolute z-[4] top-0 left-[-2px] w-[35px] bg-gradient-to-r from-background from-[20%] to-transparent to-[100%]" />
                 <div className="h-[250px] absolute z-[4] top-0 right-[-2px] w-[35px] bg-gradient-to-l from-background from-[20%] to-transparent to-[100%]" />

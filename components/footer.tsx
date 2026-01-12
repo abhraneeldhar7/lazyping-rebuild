@@ -32,7 +32,7 @@ export default function FooterComponent() {
                             <span>Antk</span>
                             <span className="relative inline-block">
                                 i
-                                <span className="absolute left-1/2 -translate-x-1/2 top-[0.25em] bg-foreground rounded-full text-background p-[4px] h-[0.25em] w-[0.25em] flex items-center justify-center">
+                                <span className="absolute left-1/2 -translate-x-1/2 top-[0.25em] bg-foreground rounded-full text-background p-[4px] h-[0.25em] w-[0.25em] flex items-center justify-center cursor-pointer select-none">
                                     <AnimatedThemeToggler />
                                 </span>
                             </span>

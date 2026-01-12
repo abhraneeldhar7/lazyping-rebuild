@@ -4,6 +4,7 @@ import { PingsSoFar } from "@/components/landingpageComp/pingsSoFar";
 import { Button } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { TextAnimate } from "@/components/ui/text-animate";
 import { MenuIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -131,17 +132,15 @@ export default function RootPage() {
             </Marquee>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-[60px] mx-auto  md:px-[40px] w-full md:mt-[100px] mt-[50px] md:justify-between max-w-[1400px]">
+        <div className="flex flex-col md:flex-row mt-[100px] gap-[60px] mx-auto md:px-[40px] w-full md:justify-between max-w-[1400px]">
 
-            <div className="md:flex-2 flex flex-col gap-[60] max-w-[520px]">
+            <div className="md:flex-2 flex flex-col gap-[100] max-w-[520px]">
                 <ChartsThing />
                 <LogsThing />
             </div>
 
             <div className="md:flex-3 flex flex-col relative items-center justify-between h-[400px] md:h-[500px] overflow-hidden" >
-                <div className="border rounded-[30px] py-[8px] px-[16px] leading-[1em] text-[14px] flex items-center  gap-[12px] bg-muted shadow-md">
-                    <PingsSoFar />
-                </div>
+
 
                 <Image src="/landingpage/coolDude.png" height={400} width={400} className="object-contain w-fit h-[350px] md:h-[450px] absolute bottom-0" alt="" unoptimized />
                 <div className="h-[60px] w-full absolute bottom-0 bg-gradient-to-t from-background from-[0%] to-transparent to-[100%] z-[2]" />
@@ -173,10 +172,14 @@ export default function RootPage() {
 
         </div>
 
-        <div className="flex justify-center relative h-[55vh] md:h-[100vh] w-full mt-[80px] pt-[30px]">
-            <h1 className="md:absolute leading-[1.2em] top-[10%] left-[5%] md:text-[70px] text-[40px] text-center font-[600]">Public Status Page</h1>
-            <h1 className="absolute bottom-[10%] right-[5%] md:text-[50px] text-[30px] text-right font-[600] z-[2]">Never keep users guessing</h1>
-            <Image src="/landingpage/mockup.png" height={500} width={500} className="absolute bottom-0 h-[85%] object-bottom object-contain w-fit" alt="" unoptimized />
+        <div className="flex justify-between flex-col relative h-[53vh] md:h-[100vh] w-full mt-[80px] p-[20px]">
+            <TextAnimate className="md:absolute leading-[1.2em] top-[10%] left-[5%] md:text-[70px] text-[40px] text-center font-[600]" animation="blurIn" as="h1">
+                Public Status Page
+            </TextAnimate>
+            <TextAnimate className="md:absolute bottom-[10%] right-[5%] md:text-[50px] text-[40px] text-right font-[600] z-[2]" animation="slideUp" as="h1">
+                Never keep users guessing
+            </TextAnimate>
+            <Image src="/landingpage/mockup.png" height={500} width={500} className="absolute bottom-0 h-[90%] md:h-[85%] object-bottom object-contain w-fit left-[50%] translate-x-[-50%]" alt="" unoptimized />
         </div>
 
 
