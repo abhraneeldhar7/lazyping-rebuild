@@ -25,12 +25,13 @@ export default function RootPage() {
 
     return <div className="relative font-[Satoshi]">
 
-        <PingingCyclingBox className="hidden md:flex absolute top-[15px] left-[50%] translate-x-[-50%]" />
+        {/* <PingingCyclingBox className="absolute top-[15px] left-[50%] translate-x-[-50%]" /> */}
         <div className="h-[50px]  fixed top-0 left-0 w-full z-[10] flex items-center px-[15px] justify-between gap-[30px]">
             <Link href={"/"} className="min-w-[27px]">
                 <Image src="/appLogo.png" alt="" height={27} width={27} />
             </Link>
-            {/* <PingingCyclingBox /> */}
+            <PingingCyclingBox />
+            <div className="hidden md:block"></div>
             <div className="md:hidden">
                 <Sheet>
                     <SheetTrigger asChild>
