@@ -11,7 +11,6 @@ const TIMEOUT_MS = 10000;
 
 async function projectOutage(endpoint: EndpointType, type: "WARNING" | "OUTAGE" | "RESOLVED", data?: any) {
     console.log(`[ALERT SYSTEM] Project Outage/Alert: ${type} for ${endpoint.endpointName}`, data);
-    // TODO: Implement external notification system (Email, SMS, Webhook, etc.)
 }
 
 

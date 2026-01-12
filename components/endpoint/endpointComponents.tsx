@@ -19,11 +19,11 @@ export async function EndpointDetailsSection({ endpointId }: { endpointId: strin
 
             <div className="flex md:flex-row flex-col gap-[25px] md:justify-between md:items-start">
                 <div className="flex flex-col gap-[20px]">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-[3px]">
                         <Label>Endpoint Name</Label>
                         <p className="h-[18px] text-[18px]">{endpointDetails.endpointName}</p>
                     </div>
-                    <div className="flex flex-col gap-[4px]">
+                    <div className="flex flex-col gap-[5px]">
                         <Label>Endpoint url</Label>
                         <div className="flex gap-[10px] items-center">
                             <p className="bg-muted w-fit rounded-[5px] truncate px-[10px] py-[4px] text-[14px]">{endpointDetails.url}</p>

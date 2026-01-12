@@ -24,7 +24,18 @@ export async function LogsSections() {
         return acc;
     }, {});
 
-    const alertLogs = allLogs.filter((log: any) => log.status !== "OK" && log.status !== "RESOLVED").slice(0, 3);
+    const latestLogs: Record<string, any> = {};
+    allLogs.forEach((log: any) => {
+        if (!latestLogs[log.endpointId]) {
+            latestLogs[log.endpointId] = log;
+        }
+    });
+
+    const alertLogs = Object.values(latestLogs)
+        .filter((log: any) => log.status !== "OK" && log.status !== "RESOLVED")
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 3);
+
     const recentLogs = allLogs.slice(0, 3);
 
     return (
