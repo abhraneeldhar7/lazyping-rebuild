@@ -173,7 +173,7 @@ export default function RootPage() {
             <TextAnimate className="md:absolute leading-[1.2em] top-[10%] left-[5%] md:text-[70px] text-[40px] text-center font-[600]" animation="slideUp" as="h1">
                 Public Status Page
             </TextAnimate>
-            <TextAnimate delay={0.2} className="md:absolute bottom-[10%] right-[5%] md:text-[50px] text-[38px] text-center md:text-right font-[600] z-[2]" animation="slideUp" as="h1">
+            <TextAnimate delay={0.2} className="md:absolute bottom-[10%] right-[5%] md:text-[50px] text-[38px] text-center md:text-right font-[600] z-[3]" animation="slideUp" as="h1">
                 Never keep users guessing
             </TextAnimate>
             <Image src="/landingpage/mockup.png" height={500} width={500} className="absolute bottom-0 h-[90%] md:h-[85%] object-bottom object-contain w-fit left-[50%] translate-x-[-50%]" alt="" unoptimized />

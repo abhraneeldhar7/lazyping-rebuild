@@ -63,7 +63,7 @@ export default async function StatusPage({ params }: { params: Promise<{ slug: s
             <div className="min-h-[100vh] flex flex-col gap-[35px] p-[20px] pb-[100px] max-w-[800px] w-full mx-auto relative z-[1]">
                 <div className="flex gap-[15px] items-center">
                     {publicPageData.logoUrl &&
-                        <Image src={publicPageData.logoUrl} className="h-[45px] w-[45px] object-contain rounded-lg" height={45} width={45} alt="Logo" />
+                        <Image src={publicPageData.logoUrl} className="h-[45px] w-[45px] object-cover rounded-lg" height={45} width={45} alt="Logo" />
                     }
                     <div className="flex flex-col gap-[4px]">
                         <h1 className="text-[24px] font-semibold leading-[1.1em]">{publicPageData.projectName}</h1>
