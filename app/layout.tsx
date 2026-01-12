@@ -36,13 +36,10 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased relative `}
         >
-          <ThemeProvider attribute="class">
-
+          <ThemeProvider attribute="class" enableSystem>
             <Toaster richColors position="top-center" />
             {children}
             <FooterComponent />
-
-
           </ThemeProvider>
         </body>
       </html>
