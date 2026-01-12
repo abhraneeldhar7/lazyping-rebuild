@@ -72,11 +72,37 @@ export default function RootPage() {
             </div>
         </div>
 
-        <div className="md:h-[100vh] h-[90vh] overflow-hidden relative w-full flex flex-col pt-[50px] md:justify-center justify-between items-center gap-[30px] md:gap-[20px] px-[15px] py-[40px]">
+        <div className="md:h-[100vh] h-[90vh] overflow-hidden relative w-full flex flex-col pt-[50px] md:justify-center justify-between items-center gap-[50px] md:gap-[20px] px-[15px] py-[40px]">
 
             <BGGridPattern />
             <div></div>
-            <Button variant="shinny" className="text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01] md:w-[140px] w-full">Activate</Button>
+            <div className="py-[30px]">
+                <h1 className="font-[800] md:text-[50px] text-[40px] leading-[1.2em] text-center flex flex-col items-center">
+                    <span className="flex gap-[15px]">
+                        <span>
+                            NEVER
+                        </span>
+                        <span className="font-[600]">
+                            LET YOUR
+                        </span>
+                    </span>
+                    <span className="flex gap-[15px]">
+                        <span className="text-primary">
+                            SERVERS
+                        </span>
+                        <span className="relative px-[10px]">
+                            <div className="h-[7px] w-full absolute top-[50%] translate-y-[-50%] left-0 bg-[red] z-[2]" />
+                            <span className="opacity-[0.7] font-[500] ">
+                                SLEEP
+                            </span>
+                        </span>
+                    </span>
+                </h1>
+            </div>
+
+            <Link href="/login">
+                <Button variant="shinny" className="text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01] md:w-[140px] w-full">Activate</Button>
+            </Link>
 
 
 

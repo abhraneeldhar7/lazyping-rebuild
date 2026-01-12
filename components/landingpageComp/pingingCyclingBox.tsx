@@ -44,7 +44,7 @@ export default function PingingCyclingBox({ className }: { className?: string })
                     </div>
                     {msg == "total_pings" ? (
                         <div className="flex items-center gap-[7px]">
-                            <div className="bg-[var(--success)] h-[7px] w-[7px] rounded-[50%] animate-pulse min-w-[7px]" />
+                            <div className="bg-[var(--success)] h-[8px] w-[8px] rounded-[50%] animate-pulse min-w-[8px]" />
                             <p className="whitespace-nowrap">{totalPings !== null ? `${totalPings} pings so far` : "..."}</p>
                         </div>
                     ) : <p className="whitespace-nowrap">{msg}</p>}
