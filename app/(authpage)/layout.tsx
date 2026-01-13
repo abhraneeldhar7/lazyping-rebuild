@@ -1,3 +1,4 @@
+import OAuthButtons from "@/components/auth/OAuthButtons";
 import Image from "next/image";
 
 export default function AuthLayout({
@@ -6,17 +7,19 @@ export default function AuthLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="bg-[white] h-[100vh] p-[15px] md:p-[40px] flex md:gap-[40px] relative md:flex-row flex-col-reverse">
-            <Image src="/login_pic.jpg" height={400} width={400} alt="" unoptimized className="z-[1] absolute top-0 left-0 h-full w-full object-cover blur-[15px] opacity-[0.05]" />
-
-            <div className="flex-1 flex justify-center items-center z-[2]">
-                {children}
+        <div className="flex gap-[20px] md:p-[20px] p-[15px] max-w-[1500px] w-full mx-auto relative md:h-[100vh] h-[100svh]">
+            <div className="flex-1 md:static absolute z-[-1] overflow-hidden rounded-[14px] left-0 top-0 h-full">
+                <Image className="dark:hidden h-full object-cover w-full md:opacity-[1] opacity-[0.24]" preload unoptimized alt="" src="/login/light.jpg" width={600} height={600} />
+                <Image className="hidden dark:block h-full object-cover w-full" preload unoptimized alt="" src="/login/dark.jpg" width={600} height={600} />
             </div>
-
-            <div className="flex-1 md:flex hidden justify-center text-[black] items-center z-[1] flex-col gap-[16px]">
-                <Image src="/login_pic.jpg" height={400} width={400} alt="" unoptimized
-                    className="shadow-md w-full h-fit object-contain max-w-[400px] w-full" />
-                <p className="text-[14px] opacity-[0.6]">Never let your servers sleep</p>
+            <div className="flex-1 flex flex-col items-center">
+                <div className="max-w-[350px] w-full flex flex-col gap-[20px] justify-center flex-1">
+                    {children}
+                    <div className="flex-2 flex flex-col gap-[20px]">
+                        <p className="mx-auto text-[12px] opacity-[0.6]">OR</p>
+                        <OAuthButtons />
+                    </div>
+                </div>
             </div>
         </div>
     );

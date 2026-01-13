@@ -53,20 +53,26 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button"
 
+  const buttonContent = (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      disabled={loading || props.disabled}
+      {...props}
+    >
+      {variant == "shinny" && <div className="absolute h-[35%] w-full rounded-[50%] bg-white left-0 top-[-15%] blur-[15px] z-[2]" />}
+      {loading ? <LoaderCircle className="animate-spin" /> : children}
+    </Comp>
+  )
+
+  if (variant !== "shinny") {
+    return buttonContent
+  }
+
   return (
-    <div>
-      <Comp
-        data-slot="button"
-        className={cn(buttonVariants({ variant, size, className }))}
-        disabled={loading || props.disabled}
-        {...props}
-      >
-        {variant == "shinny" && <div className="absolute h-[35%] w-full rounded-[50%] bg-white left-0 top-[-15%] blur-[15px] z-[2]" />}
-        {loading ? <LoaderCircle className="animate-spin" /> : children}
-      </Comp>
-      {variant == "shinny" &&
-        <div className="w-[95%] h-[6px] rounded-[50%] blur-[7px] translate-y-[-4px] bg-primary" />
-      }
+    <div className={cn("flex flex-col items-center", className)}>
+      {buttonContent}
+      <div className="w-[95%] h-[6px] rounded-[50%] blur-[7px] translate-y-[-4px] bg-primary mx-auto" />
     </div>
   )
 }
