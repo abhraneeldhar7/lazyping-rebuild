@@ -1,13 +1,13 @@
 import { ArrowUpRight, Globe, LinkIcon, ProjectorIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getAllUserPublicPages } from "@/app/actions/publicPageActions";
+import { getAllPublicPages } from "@/app/actions/publicPageActions";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import LoadingPublicPagesSkeleton from "@/app/dashboard/public-pages/loading";
 
 export default async function PublicLagesAll() {
-    const publicPageData = await getAllUserPublicPages();
+    const publicPageData = await getAllPublicPages();
     return (
         <div className="w-full">
             <Suspense fallback={<LoadingPublicPagesSkeleton />}>
