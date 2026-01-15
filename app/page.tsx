@@ -74,8 +74,7 @@ export default function RootPage() {
             </div>
         </div>
 
-        <div className="relative w-full flex flex-col items-center px-[15px] py-[100px] gap-[60px]">
-
+        <div className="relative w-full flex flex-col items-center px-[15px] py-[120px] gap-[50px]">
             <BGGridPattern />
             <div></div>
             <div className="flex flex-col gap-[20px]">
@@ -110,23 +109,27 @@ export default function RootPage() {
             </Link>
             <Image className="w-full h-fit max-w-[800px] object-contain hidden dark:block" alt="" src="/landingpage/dashboardImgDark.png" height={600} width={600} unoptimized />
             <Image className="w-full h-fit max-w-[800px] object-contain block dark:hidden" alt="" src="/landingpage/dashboardImgLight.png" height={600} width={600} unoptimized />
+
+
+
+            <div className="max-w-[800px] relative">
+                <div className="h-full w-[20px] absolute left-0 bg-gradient-to-r from-background from-[20%] to-transparent z-[2]" />
+                <div className="h-full w-[20px] absolute right-0 bg-gradient-to-l from-background from-[20%] to-transparent z-[2]" />
+                <Marquee className="[--duration:40s]">
+                    {smallMarqueeList.map((item, index) => (
+                        <div key={index} className="flex items-center gap-[15px]">
+                            <p>{item}</p>
+                            <div className="bg-foreground h-[4px] w-[4px] opacity-[0.8] rounded-[50%]" />
+                        </div>
+                    ))}
+                </Marquee>
+            </div>
         </div>
 
-        <div className="md:mx-[40px] my-[5px] relative">
-            <div className="h-full w-[20px] absolute left-0 bg-gradient-to-r from-background from-[20%] to-transparent z-[2]" />
-            <div className="h-full w-[20px] absolute right-0 bg-gradient-to-l from-background from-[20%] to-transparent z-[2]" />
-            <Marquee className="[--duration:40s]">
-                {smallMarqueeList.map((item, index) => (
-                    <div key={index} className="flex items-center gap-[15px]">
-                        <p>{item}</p>
-                        <div className="bg-foreground h-[4px] w-[4px] opacity-[0.8] rounded-[50%]" />
-                    </div>
-                ))}
-            </Marquee>
-        </div>
 
 
-        <div className="flex gap-[30px] flex-col max-w-[800px] w-full mx-auto mt-[50px]  md:mt-[100px]">
+
+        <div className="flex gap-[45px] flex-col max-w-[800px] w-full mx-auto">
             <div className="flex-1 px-[15px]">
                 <div>
                     <h1 className="text-[24px] md:text-[34px] font-[500]">Detailed Performance Insights</h1>
