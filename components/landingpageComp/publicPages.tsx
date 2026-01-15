@@ -11,7 +11,7 @@ export default async function PublicLagesAll() {
     return (
         <div className="w-full">
             <Suspense fallback={<LoadingPublicPagesSkeleton />}>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-[15px]">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[15px]">
                     {publicPageData.map((page: any, index: number) => (
                         <Link
                             key={index}
