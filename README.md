@@ -1,6 +1,6 @@
 # LazyPing 🛰️
 
-![LazyPing Open Graph Image](/public/app/opengraph-image.png)
+![LazyPing Open Graph Image](/app/opengraph-image.png)
 
 LazyPing is a high-performance, real-time server monitoring and uptime detection platform. It allows users to track their project's health, monitor latency, and receive alerts when services are down or degraded.
 
