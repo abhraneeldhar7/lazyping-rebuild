@@ -44,14 +44,25 @@ export default function SignupPage() {
 
         try {
             const [firstName, ...lastNameParts] = fullName.split(" ");
-            const lastName = lastNameParts.join(" ") || " "; // Clerk might require lastName
+            const lastName = lastNameParts.join(" ") || null; // Clerk might require lastName
 
-            await signUp.create({
-                firstName,
-                lastName,
-                emailAddress: email,
-                password,
-            });
+            let newUserObj;
+            if (lastName) {
+                newUserObj = {
+                    firstName,
+                    lastName,
+                    emailAddress: email,
+                    password
+                }
+            }
+            else {
+                newUserObj = {
+                    firstName,
+                    emailAddress: email,
+                    password
+                }
+            }
+            await signUp.create(newUserObj);
 
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
@@ -147,6 +158,8 @@ export default function SignupPage() {
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Eduardo"
                         required
+                        disabled={isLoading}
+
                     />
                 </div>
                 <div className="flex flex-col gap-[7px]">
@@ -157,6 +170,8 @@ export default function SignupPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="ryangosling@harvard.edu"
                         required
+                        disabled={isLoading}
+
                     />
                 </div>
                 <div className="flex flex-col gap-[7px]">
@@ -167,6 +182,8 @@ export default function SignupPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={isLoading}
+
                         />
                         <Button
                             type="button"
@@ -186,6 +203,8 @@ export default function SignupPage() {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
+                            disabled={isLoading}
+
                         />
                         <Button
                             type="button"
@@ -197,7 +216,7 @@ export default function SignupPage() {
                         </Button>
                     </div>
                 </div>
-                <Button loading={isLoading} className="w-full h-[45px] mt-[10px]" variant="secondary" type="submit">
+                <Button loading={isLoading} className="w-full h-[45px] mt-[10px]" type="submit">
                     Sign Up
                 </Button>
             </form>

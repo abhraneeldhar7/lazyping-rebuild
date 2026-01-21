@@ -12,6 +12,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "focus-visible:border-ring/80 focus-visible:ring-ring/40 focus-visible:ring-[1px]",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         "backdrop-blur-[7px]",
+        "h-9",
         className
       )}
       {...props}

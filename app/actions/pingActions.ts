@@ -234,58 +234,77 @@ export async function pingEndpoint(
     };
     await redis.set(`endpoint:${endpoint.endpointId}`, serialize(updatedEndpointObj));
 
-    if (statusChanged) {
-        let updatedEndpoints: any[] = [];
+    // Get current project status from cache to see if we need to force an update
+    const cachedProject = await deserialize<ProjectType>(await redis.get(`project:${endpoint.projectId}`));
+    const projectNeedsUpdate = statusChanged || (cachedProject && cachedProject.overallStatus === null);
 
-        const endpointIds = await redis.smembers(`project:${endpoint.projectId}:endpoints`);
-        if (endpointIds.length > 0) {
-            const keys = endpointIds.map(id => `endpoint:${id}`);
-            const cached = await redis.mget(keys);
-            updatedEndpoints = cached
-                .map(e => deserialize<EndpointType>(e))
-                .filter(e => e !== null);
-        }
-
-        if (updatedEndpoints.length === 0) {
-            updatedEndpoints = await db.collection("endpoints")
-                .find({ projectId: endpoint.projectId })
-                .toArray();
-        }
-
-        updatedEndpoints = updatedEndpoints.map((e: any) =>
-            e.endpointId === endpoint.endpointId
-                ? { ...e, currentStatus: actualNewStatus }
-                : e
-        );
-
-
-        const downCount = updatedEndpoints.filter((e: any) => e.currentStatus === "DOWN").length;
-        const degradedCount = updatedEndpoints.filter((e: any) => e.currentStatus === "DEGRADED").length;
-        const totalCount = updatedEndpoints.length;
-
-        let projectStatus: ProjectType['overallStatus'] = "OPERATIONAL";
-
-        if (downCount === totalCount && totalCount > 0) {
-            projectStatus = "MAJOR_OUTAGE";
-        } else if (downCount > 0) {
-            projectStatus = "PARTIAL_OUTAGE";
-        } else if (degradedCount > 0) {
-            projectStatus = "DEGRADED";
-        }
-
-        await db.collection("projects").updateOne(
-            { projectId: endpoint.projectId },
-            { $set: { overallStatus: projectStatus } }
-        );
-
-        const project = await deserialize<ProjectType>(await redis.get(`project:${endpoint.projectId}`));
-        if (project) {
-            project.overallStatus = projectStatus;
-            await redis.set(`project:${endpoint.projectId}`, serialize(project));
-        }
+    if (projectNeedsUpdate) {
+        await updateProjectStatus(endpoint.projectId, db);
     }
 
     return JSON.parse(JSON.stringify(log));
+}
+
+export async function updateProjectStatus(projectId: string, dbInstance?: any) {
+    const db = dbInstance || await getDB();
+
+    // 1. Get all endpoints for this project
+    let endpoints: EndpointType[] = [];
+    const endpointIds = await redis.smembers(`project:${projectId}:endpoints`);
+
+    if (endpointIds.length > 0) {
+        const keys = endpointIds.map(id => `endpoint:${id}`);
+        const cached = await redis.mget(keys);
+        endpoints = cached
+            .map(e => deserialize<EndpointType>(e))
+            .filter((e): e is EndpointType => e !== null);
+    }
+
+    if (endpoints.length === 0 || endpoints.length < endpointIds.length) {
+        endpoints = await db.collection("endpoints")
+            .find({ projectId: projectId })
+            .toArray() as EndpointType[];
+    }
+
+    // 2. Filter to only ENABLED endpoints
+    const enabledEndpoints = endpoints.filter(e => e.enabled);
+
+    const downCount = enabledEndpoints.filter(e => e.currentStatus === "DOWN").length;
+    const degradedCount = enabledEndpoints.filter(e => e.currentStatus === "DEGRADED").length;
+    const totalCount = enabledEndpoints.length;
+
+    let projectStatus: ProjectType['overallStatus'] = "OPERATIONAL";
+
+    if (totalCount === 0) {
+        projectStatus = "OPERATIONAL"; // Or "UNKNOWN/null" if you prefer
+    } else if (downCount === totalCount) {
+        projectStatus = "MAJOR_OUTAGE";
+    } else if (downCount > 0) {
+        projectStatus = "PARTIAL_OUTAGE";
+    } else if (degradedCount > 0) {
+        projectStatus = "DEGRADED";
+    }
+
+    // 3. Update DB
+    await db.collection("projects").updateOne(
+        { projectId: projectId },
+        { $set: { overallStatus: projectStatus } }
+    );
+
+    // 4. Update Cache
+    const project = await deserialize<ProjectType>(await redis.get(`project:${projectId}`));
+    if (project) {
+        project.overallStatus = projectStatus;
+        await redis.set(`project:${projectId}`, serialize(project));
+    } else {
+        // If not in cache, fetch from DB to be sure it's cached correctly now
+        const dbProject = await db.collection("projects").findOne({ projectId: projectId }, { projection: { _id: 0 } });
+        if (dbProject) {
+            await redis.set(`project:${projectId}`, serialize(dbProject));
+        }
+    }
+
+    return projectStatus;
 }
 
 export async function getTotalPingCount() {

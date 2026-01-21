@@ -5,6 +5,7 @@ import { PingLog, ProjectType } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
+import { updateProjectStatus } from "./pingActions";
 import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
 
@@ -229,5 +230,6 @@ export async function pauseProject(projectId: string) {
     }
     await pipeline.exec();
 
+    await updateProjectStatus(projectId);
     revalidatePath(`/project/${projectId}`);
 }

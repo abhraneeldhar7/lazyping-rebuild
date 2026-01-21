@@ -65,6 +65,7 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        disabled={isLoading}
                     />
                 </div>
                 <div className="flex flex-col gap-[7px]">
@@ -75,6 +76,7 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={isLoading}
                         />
                         <Button
                             type="button"
@@ -86,7 +88,7 @@ export default function LoginPage() {
                         </Button>
                     </div>
                 </div>
-                <Button loading={isLoading} className="w-full h-[45px] mt-[10px]" variant="secondary" type="submit">
+                <Button loading={isLoading} className="w-full h-[45px] mt-[10px]" type="submit">
                     Log In
                 </Button>
             </form>

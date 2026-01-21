@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { TextAnimate } from "@/components/ui/text-animate";
-import { ChevronRight, MenuIcon, XIcon } from "lucide-react";
+import { ChevronRight, GithubIcon, MenuIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -105,9 +105,17 @@ export default function RootPage() {
                 <p className="text-[15px] md:text-[18px] opacity-[0.8] px-[10px] text-center">We ping your servers at fixed intervals and alert you of any anomaly</p>
             </div>
 
-            <Link href="/login" className="md:w-[140px] w-full">
-                <Button variant="shinny" className="text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01] w-full">Activate</Button>
-            </Link>
+            <div className="flex justify-center items-center gap-[10px] md:flex-row flex-col-reverse">
+
+                <Link href="https://github.com/abhraneeldhar7/lazyping" className="md:w-[150px] w-full border rounded-[10px]" target="_blank">
+                    <Button variant="ghost" className="text-[15px] md:h-[50px] h-[55px] hover:scale-[1.01] w-full">
+                        Open Source <GithubIcon size={17} />
+                    </Button>
+                </Link>
+                <Link href="/login" className="md:w-[140px] w-full">
+                    <Button variant="shinny" className="text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01] w-full">Activate</Button>
+                </Link>
+            </div>
 
             <div className="max-w-[800px] w-full mx-auto">
 

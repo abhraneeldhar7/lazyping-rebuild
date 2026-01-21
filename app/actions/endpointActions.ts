@@ -5,7 +5,7 @@ import { EndpointType, methodType, PingLog } from "@/lib/types";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
-import { pingEndpoint } from "./pingActions";
+import { pingEndpoint, updateProjectStatus } from "./pingActions";
 import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
 
@@ -54,6 +54,7 @@ export async function createEndpoint(data: {
     await redis.sadd(`project:${data.projectId}:endpoints`, newEndpoint.endpointId);
 
     await pingEndpoint(newEndpoint.endpointId)
+    await updateProjectStatus(data.projectId);
     revalidatePath(`/project/${data.projectId}`);
     return (newEndpoint.endpointId)
 }
@@ -176,6 +177,7 @@ export async function updateEndpoint(data: EndpointType) {
         await redis.set(`endpoint:${data.endpointId}`, serialize(freshEndpoint));
     }
 
+    await updateProjectStatus(endpoint.projectId);
     revalidatePath(`/project/${endpoint.projectId}`);
 }
 
@@ -232,6 +234,7 @@ export async function deleteEndpoint(id: string) {
     await redis.del(`endpoint:${id}`);
     await redis.srem(`project:${endpoint.projectId}:endpoints`, id);
 
+    await updateProjectStatus(endpoint.projectId);
     revalidatePath(`/project/${endpoint.projectId}`);
 }
 
@@ -256,5 +259,6 @@ export async function toggleEndpoint(endpoint: EndpointType) {
         await redis.set(`endpoint:${endpoint.endpointId}`, serialize(freshEndpoint));
     }
 
+    await updateProjectStatus(endpoint.projectId);
     revalidatePath(`/project/${endpoint.projectId}/e/${endpoint.endpointId}`);
 }

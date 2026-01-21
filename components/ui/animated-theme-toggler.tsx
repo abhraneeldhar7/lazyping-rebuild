@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Moon, Sun } from "lucide-react"
 import { flushSync } from "react-dom"
+import { useTheme } from "next-themes"
 
 import { cn } from "@/lib/utils"
 
@@ -16,6 +17,7 @@ export const AnimatedThemeToggler = ({
   duration = 400,
   ...props
 }: AnimatedThemeTogglerProps) => {
+  const { setTheme, resolvedTheme } = useTheme()
   const [isDark, setIsDark] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -38,12 +40,26 @@ export const AnimatedThemeToggler = ({
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return
 
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light"
+    const targetTheme = resolvedTheme === "dark" ? "light" : "dark"
+    const newTheme = targetTheme === systemTheme ? "system" : targetTheme
+
+    const transition = () => {
+      setTheme(newTheme)
+      // Manually toggle class for the transition animation to capture the change immediately
+      document.documentElement.classList.toggle("dark", targetTheme === "dark")
+    }
+
+    if (!document.startViewTransition) {
+      transition()
+      return
+    }
+
     await document.startViewTransition(() => {
       flushSync(() => {
-        const newTheme = !isDark
-        setIsDark(newTheme)
-        document.documentElement.classList.toggle("dark")
-        localStorage.setItem("theme", newTheme ? "dark" : "light")
+        transition()
       })
     }).ready
 
@@ -69,7 +85,7 @@ export const AnimatedThemeToggler = ({
         pseudoElement: "::view-transition-new(root)",
       }
     )
-  }, [isDark, duration])
+  }, [resolvedTheme, setTheme, duration])
 
   return (
     <button

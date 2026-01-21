@@ -3,7 +3,7 @@ import { EndpointType, PingLog, ProjectType } from "@/lib/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ArrowUpRight, CheckIcon, OctagonAlert, RssIcon, SquareArrowOutUpRight } from "lucide-react";
+import { ArrowUpRight, CheckIcon, OctagonAlert, ProjectorIcon, RssIcon, SquareArrowOutUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getProjectDetails } from "@/app/actions/projectActions";
 import { getEndpointDetails } from "@/app/actions/endpointActions";
@@ -125,42 +125,67 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                     </SheetHeader>
 
                     <div className="flex flex-col gap-[20px] ">
-                        <div className="flex flex-col gap-[3px]">
+                        <div className="flex flex-col gap-[5px]">
                             <Label>
                                 Project name
                             </Label>
-                            {!projectDetails ?
-                                <div className="rounded-[4px] h-[20px] w-full animate-pulse bg-foreground/20 dark:bg-foreground/10 mt-[4px]" />
-                                :
-                                <Link href={`/project/${projectDetails?.projectId}`} className="flex items-center gap-[10px] text-[15px]">
+                            <div className="flex rounded-[8px] leading-[1em] border h-[35px] w-full text-[14px]">
+                                <div className="w-fit flex items-center justify-center px-[10px] bg-muted rounded-tl-[8px] rounded-bl-[8px]"><ProjectorIcon size={14} /></div>
+                                <Link href={`/project/${projectDetails?.projectId}`} className="truncate flex justify-between w-full gap-[10px] h-full flex-1 flex items-center px-[10px]">
                                     <p className="truncate">
                                         {projectDetails?.projectName}
                                     </p>
-
-                                    <SquareArrowOutUpRight size={14} className="opacity-[0.7] min-w-fit" />
+                                    <SquareArrowOutUpRight size={14} className="min-w-fit text-primary" />
                                 </Link>
-
-                            }
+                            </div>
                         </div>
-                        <div className="flex flex-col gap-[3px]">
+                        <div className="flex flex-col gap-[5px]">
                             <Label>
                                 Endpoint
                             </Label>
-                            <Link href={`/project/${projectDetails?.projectId}/e/${selectedLog?.endpointId}`} className="truncate flex items-center gap-[10px] text-[15px]">
-                                <p className="truncate">
-                                    {selectedLog?.url}
-                                </p>
-                                <SquareArrowOutUpRight size={14} className="opacity-[0.7] min-w-fit" />
-                            </Link>
+                            <div className="flex rounded-[8px] leading-[1em] border h-[35px] w-full text-[14px]">
+                                <div className="w-fit flex items-center justify-center px-[10px] bg-muted rounded-tl-[8px] rounded-bl-[8px]">{selectedLog?.method}</div>
+                                <Link href={`/project/${projectDetails?.projectId}/e/${selectedLog?.endpointId}`} className="truncate flex justify-between w-full gap-[10px] h-full flex-1 flex items-center px-[10px]">
+                                    <p className="truncate">
+                                        {selectedLog?.url}
+                                    </p>
+                                    <SquareArrowOutUpRight size={14} className="min-w-fit text-primary" />
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between gap-[10px] items-end">
+                            {selectedLog?.latencyMs &&
+                                <div className="flex flex-col gap-[3px]">
+                                    <Label>Latency <RssIcon size={12} /> </Label>
+                                    <p className="text-[15px]">{selectedLog?.latencyMs} ms</p>
+                                </div>
+                            }
+                            {selectedLog &&
+                                <>
+                                    {selectedLog.status === "OK" ?
+                                        <div className="rounded-full bg-[#00ff9e]/10 border border-[#00ff9e]/30 py-[2px] pt-[3px] px-[8px] w-fit text-[11px] text-[#00ff9e] flex items-center gap-[4px]">
+                                            Active <CheckIcon size={10} />
+                                        </div> :
+                                        selectedLog.status === "RESOLVED" ?
+                                            <div className="rounded-full bg-muted border border-border py-[2px] pt-[3px] px-[8px] w-fit text-[11px] text-muted-foreground flex items-center gap-[4px]">
+                                                Resolved <CheckIcon size={10} />
+                                            </div> :
+                                            <div className="rounded-full bg-[#ed0707]/10 border border-[#ed0707]/30 py-[2px] pt-[3px] px-[8px] w-fit text-[11px] text-[#ed0707] flex items-center gap-[4px]">
+                                                Warning <OctagonAlert size={10} />
+                                            </div>
+                                    }
+                                </>
+                            }
                         </div>
 
                         {selectedLog?.responseMessage &&
                             <div className="flex flex-col gap-[7px]">
                                 <Label>Response</Label>
-                                <ScrollArea className="h-[150px] text-[15px] bg-muted py-[10px] px-[15px] border rounded-[12px]">
-                                    <pre>
-                                        {selectedLog?.responseMessage}
-                                    </pre>
+                                <ScrollArea className="h-[150px] text-[14px] bg-muted py-[8px] px-[10px] border rounded-[12px]">
+                                    <p className="font-[300]">
+                                        {selectedLog.responseMessage}
+                                    </p>
                                 </ScrollArea>
                             </div>
                         }
@@ -175,33 +200,9 @@ export default function LogsTable({ logsData }: { logsData: PingLog[] }) {
                             </div>
                         }
 
-                        {selectedLog?.latencyMs &&
-                            <div className="flex flex-col gap-[3px]">
-                                <Label>Latency <RssIcon size={12} /> </Label>
-                                <p className="text-[15px]">{selectedLog?.latencyMs} ms</p>
-                            </div>
-                        }
 
-                        <div className="flex flex-col gap-[6px]">
-                            <Label>Status</Label>
-                            <div className="flex gap-[3px] border rounded-[7px] text-[15px]">
-                                <div className="w-fit bg-muted px-[10px] py-[5px] border-r rounded-[7px]">
-                                    {selectedLog?.method}
-                                </div>
-                                <div className="flex-1 flex items-center justify-center text-[12px]">
-                                    {selectedLog?.status}
-                                </div>
-                                <div className="flex items-center justify-center px-[15px] text-[12px]">
-                                    {selectedLog?.statusCode}
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="flex flex-col gap-[6px]">
-                            <Label>Summary</Label>
-                            <p className="text-[15px]">{selectedLog?.logSummary}</p>
-                        </div>
-
+                        <p className="text-[12px] opacity-[0.6] text-center mt-[15px]">{selectedLog?.logSummary}</p>
                     </div>
 
 
