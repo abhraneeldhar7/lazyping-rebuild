@@ -12,9 +12,14 @@ export default function BarUptime({ logs, hideLabel = false, hideTooltip = false
     const buckets = useMemo(() => {
         const now = new Date();
         const result = [];
-        for (let i = 23; i >= 0; i--) {
-            const bucketEnd = new Date(now.getTime() - i * 3600000);
-            const bucketStart = new Date(bucketEnd.getTime() - 3600000);
+
+        // Create 24 buckets, each representing 1 hour
+        // Start from 24 hours ago and go to now
+        const startTime = new Date(now.getTime() - 24 * 3600000); // 24 hours ago
+
+        for (let i = 0; i < 24; i++) {
+            const bucketStart = new Date(startTime.getTime() + i * 3600000);
+            const bucketEnd = new Date(bucketStart.getTime() + 3600000);
 
             const logsInBucket = logs.filter(log => {
                 const logTime = new Date(log.timestamp).getTime();
@@ -42,6 +47,7 @@ export default function BarUptime({ logs, hideLabel = false, hideTooltip = false
                 count: logsInBucket.length
             });
         }
+
         return result;
     }, [logs]);
 
