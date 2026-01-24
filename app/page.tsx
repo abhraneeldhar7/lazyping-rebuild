@@ -106,14 +106,13 @@ export default function RootPage() {
                 <p className="text-[15px] md:text-[18px] opacity-[0.8] px-[10px] text-center">We ping your servers at fixed intervals and alert you of any anomaly</p>
             </div>
 
-            <div className="flex justify-center items-center gap-[10px] md:flex-row flex-col-reverse w-full">
-
-                <Link href="https://github.com/abhraneeldhar7/lazyping" className="md:w-[150px] w-full border rounded-[10px]" target="_blank">
+            <div className="flex justify-center items-center gap-[10px] md:gap-[20px] md:flex-row flex-col-reverse w-full max-w-[500px]">
+                <Link href="https://github.com/abhraneeldhar7/lazyping" className="md:w-[150px] w-full border rounded-[10px] flex-1" target="_blank">
                     <Button variant="ghost" className="text-[15px] md:h-[50px] h-[55px] hover:scale-[1.01] w-full">
                         Open Source <GithubIcon size={17} />
                     </Button>
                 </Link>
-                <Link href="/login" className="md:w-[140px] w-full">
+                <Link href="/login" className="md:w-[140px] w-full flex-1">
                     <Button variant="shinny" className="text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01] w-full">Activate</Button>
                 </Link>
             </div>
@@ -185,7 +184,7 @@ export default function RootPage() {
             <div className="flex-1">
                 <div>
                     <h1 className="text-[34px] font-[500]">Pricing</h1>
-                    <p className="text-[16px] mt-[8px]">I just added pricing to learn payment gateways. You can always fork the repo and host it yourself for free.</p>
+                    <p className="text-[16px] mt-[8px]">I just added pricing to learn payment gateways. You can always <Link className="font-[500] underline" href="https://github.com/abhraneeldhar7/lazyping" target="_blank">fork the repo</Link> and host it yourself for free.</p>
                 </div>
             </div>
 
@@ -208,7 +207,7 @@ export default function RootPage() {
                 </div>
 
 
-                <div className="flex-1 flex flex-col rounded-[5px] border bg-muted">
+                <div className="flex-1 flex flex-col rounded-[5px] border bg-primary/20">
                     <div className="p-[15px] pt-[10px]">
                         <div className="flex justify-between">
                             <h1 className="text-[26px]"><span className="text-[var(--primary)]">Pro</span></h1>
