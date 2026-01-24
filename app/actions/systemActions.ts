@@ -10,7 +10,7 @@ export async function processScheduledPings() {
     const dueEndpoints = (await db.collection("endpoints")
         .find({
             enabled: true,
-            nextPingAt: { $lte: new Date() }
+            nextPingAt: { $lte: now }
         })
         .toArray()) as unknown as EndpointType[];
 
@@ -29,4 +29,19 @@ export async function processScheduledPings() {
     await Promise.all(pingPromises);
 
     return { processed: pingedEndpointsLog.length, pingedEndpointsLog };
+}
+
+
+export async function renameClerkIdToUserId() {
+    const db = await getDB()
+    const result = await db.collection("users").updateMany(
+        { clerkId: { $exists: true } },
+        {
+            $rename: {
+                clerkId: "userId",
+            },
+        }
+    );
+
+    console.log(`Updated ${result.modifiedCount} users`);
 }

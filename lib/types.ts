@@ -1,3 +1,5 @@
+import { UserTierType } from "./pricingTiers";
+
 export interface ProjectType {
     projectId: string,
     projectName: string,
@@ -63,21 +65,13 @@ export interface PublicPageType {
     logoUrl: string | null,
 }
 
-export interface User {
-    userId: string; // Clerk user ID
+export interface UserType {
+    userId: string;
     email: string;
     name: string | null;
-    tier: "FREE" | "PRO" | "ENTERPRISE";
+    avatar: string | null;
+    provider: string;
     createdAt: Date;
     updatedAt: Date;
-
-    // Subscription info (if using Stripe or similar)
-    subscriptionId?: string | null;
-    subscriptionStatus?: "active" | "canceled" | "past_due" | "trialing" | null;
-    subscriptionCurrentPeriodEnd?: Date | null;
-
-    // Usage tracking (optional, for analytics)
-    totalProjects?: number;
-    totalEndpoints?: number;
-    totalPings?: number;
+    subscriptionTier: UserTierType;
 }

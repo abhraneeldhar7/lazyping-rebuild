@@ -26,12 +26,6 @@ export function UserPopoverComponent() {
 
             </PopoverTrigger>
             <PopoverContent autoFocus={false} className="flex flex-col gap-[4px] p-[4px] w-[160px]">
-                {/* <Link href="/profile">
-                    <PopoverClose className="w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]">
-                        <UserRound size={14} />
-                        Profile
-                    </PopoverClose>
-                </Link> */}
                 <Link href="/dashboard">
                     <PopoverClose className="w-full flex justify-start gap-[7px] text-[14px] items-center px-[10px] py-[5px] hover:bg-muted rounded-[4px]">
                         <LayoutGrid size={14} />

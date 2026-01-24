@@ -2,6 +2,8 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { getDB } from "@/lib/db";
 import redis from "@/lib/redis";
+import { UserType } from "@/lib/types";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
   const payload = await req.text();
@@ -17,33 +19,44 @@ export async function POST(req: Request) {
 
   if (evt.type === "user.created" || evt.type === "user.updated") {
     const db = await getDB();
-    const users = db.collection("users");
+    const users = db.collection<UserType>("users");
 
     const data = evt.data;
 
     await users.updateOne(
-      { clerkId: data.id },
+      { userId: data.id },
       {
         $set: {
-          clerkId: data.id,
+          userId: data.id,
           email: data.email_addresses?.[0]?.email_address,
           name: `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
           avatar: data.image_url,
           provider: data.external_accounts?.[0]?.provider || "email",
-          updatedAt: new Date(),
-        },
-        $setOnInsert: {
           createdAt: new Date(),
-        },
-      },
-      { upsert: true }
+          updatedAt: new Date(),
+          subscriptionTier: "FREE"
+        }
+      }
     );
-  } else if (evt.type === "user.deleted") {
+
+
+    (await clerkClient()).users.updateUser(data.id, {
+      publicMetadata: {
+        onboardingCompleted: false,
+        subscriptionTier: "FREE"
+      }
+    })
+  }
+
+
+
+
+  else if (evt.type === "user.deleted") {
     const db = await getDB();
-    const clerkId = evt.data.id;
+    const userId = evt.data.id;
 
     // 1. Find all projects belonging to this user
-    const projects = await db.collection("projects").find({ ownerId: clerkId }).toArray();
+    const projects = await db.collection("projects").find({ ownerId: userId }).toArray();
     const projectIds = projects.map(p => p.projectId);
 
     if (projectIds.length > 0) {
@@ -51,7 +64,7 @@ export async function POST(req: Request) {
       await db.collection("endpoints").deleteMany({ projectId: { $in: projectIds } });
       await db.collection("logs").deleteMany({ projectId: { $in: projectIds } });
       await db.collection("public-page").deleteMany({ projectId: { $in: projectIds } });
-      await db.collection("projects").deleteMany({ ownerId: clerkId });
+      await db.collection("projects").deleteMany({ ownerId: userId });
 
       // 3. Clean up Redis Cache
       const pipeline = redis.pipeline();
@@ -67,12 +80,12 @@ export async function POST(req: Request) {
         pipeline.del(`project:${projectId}:endpoints`);
       }
 
-      pipeline.del(`user:${clerkId}:projects`);
+      pipeline.del(`user:${userId}:projects`);
       await pipeline.exec();
     }
 
     // 4. Delete the user from MongoDB
-    await db.collection("users").deleteOne({ clerkId });
+    await db.collection("users").deleteOne({ userId });
   }
 
   return new Response("OK");

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Marquee } from "@/components/ui/marquee";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { TextAnimate } from "@/components/ui/text-animate";
-import { ChevronRight, GithubIcon, MenuIcon, XIcon } from "lucide-react";
+import { getTierLimits } from "@/lib/pricingTiers";
+import { ChevronRight, CircleCheck, GithubIcon, MenuIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,7 +26,7 @@ export default function RootPage() {
     const smallMarqueeList = ["Anti Sleep", "Performance Tracker", "Down Detector", "Public status page", "Latency tracker", "Alert Integrations"]
 
 
-    return <div className="relative font-[Satoshi] overflow-hidden">
+    return <div className="relative font-[Satoshi] overflow-hidden pb-[50px]">
 
         {/* <PingingCyclingBox className="absolute top-[15px] left-[50%] translate-x-[-50%]" /> */}
         <div className="h-[50px]  fixed top-0 left-0 w-full z-[10] flex items-center px-[15px] justify-between gap-[30px]">
@@ -173,15 +174,51 @@ export default function RootPage() {
             <div className="bg-gradient-to-t from-background to-transparent absolute z-[2] bottom-0 left-0 right-0 h-[60px] w-full" />
         </div>
 
-        <div className="flex flex-col gap-[10px] mb-[50px] px-[15px] md:px-[40px] w-full">
+        {/* <div className="flex flex-col gap-[10px] mb-[50px] px-[15px] md:px-[40px] w-full">
             <h1 className="text-[20px] opacity-[0.8]">Examples</h1>
             <PublicLagesAll />
-        </div>
+        </div> */}
 
-        <div className="flex justify-center">
+        <div id="pricing" className="flex justify-center my-[50px]" >
             <Link href="/login" className="w-fit mb-[60px]">
                 <Button variant="shinny" className="md:w-[140px] w-full text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01]">Get Started</Button>
             </Link>
+        </div>
+
+        <div className="flex gap-[25px] flex-col max-w-[800px] w-full mx-auto px-[15px]">
+            <div className="flex-1">
+                <div>
+                    <h1 className="text-[24px] md:text-[34px] font-[500]">Pricing</h1>
+                    <p className="text-[14px] md:text-[16px]">I just added pricing to learn payment gateways. You can always fork the repo and host it yourself for free.</p>
+                </div>
+            </div>
+
+            <div className="flex gap-[15px] md:flex-row flex-col">
+                <div className="flex-1 flex flex-col rounded-[5px] border p-[15px] pt-[10px] bg-muted">
+                    <div className="flex justify-between">
+                        <h1 className="text-[24px]">Free plan</h1>
+                        <h1 className="text-[30px]">${getTierLimits("FREE").pricing_per_month.usd}</h1>
+                    </div>
+                    <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_projects} projects</p>
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_endpoints_per_project} endpoints per project</p>
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_history_days} days performance history</p>
+                    </div>
+                </div>
+
+
+                <div className="flex-1 flex flex-col rounded-[5px] border p-[15px] pt-[10px] bg-muted">
+                    <div className="flex justify-between">
+                        <h1 className="text-[26px]"><span className="text-[var(--primary)]">Pro</span></h1>
+                        <h1 className="text-[30px]">${getTierLimits("PRO").pricing_per_month.usd}</h1>
+                    </div>
+                    <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_projects} projects</p>
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_endpoints_per_project} endpoints per project</p>
+                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_history_days} days performance history</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

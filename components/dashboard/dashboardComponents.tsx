@@ -122,7 +122,7 @@ export async function ProjectsGrid() {
                         <p className="text-[14px] mb-[15px] text-muted-foreground opacity-[0.8]">
                             Create your first project to start monitoring.
                         </p>
-                        <NewProjectBtn />
+                        <NewProjectBtn projectCount={projectsArray.length} />
                     </div>
                 ) : (
                     <div className="flex flex-col gap-[40px]">
@@ -132,7 +132,7 @@ export async function ProjectsGrid() {
                             ))}
                         </div>
                         <div className="mx-auto">
-                            <NewProjectBtn />
+                            <NewProjectBtn projectCount={projectsArray.length} />
                         </div>
                     </div>
                 )}

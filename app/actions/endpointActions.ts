@@ -8,6 +8,11 @@ import { v4 as uuidv4 } from "uuid";
 import { pingEndpoint, updateProjectStatus } from "./pingActions";
 import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
+import { allowed_ping_intervals } from "@/lib/constants";
+import { Db } from "mongodb";
+import { getProjectDetails, getProjects } from "./projectActions";
+import { getUserDetails } from "./userActions";
+import { getTierLimits } from "@/lib/pricingTiers";
 
 
 export async function createEndpoint(data: {
@@ -22,6 +27,27 @@ export async function createEndpoint(data: {
 }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
+
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) return { success: false, message: "User not found" }
+    const projectEndpointCount = (await getEndpoints(data.projectId)).length;
+
+    if (projectEndpointCount >= getTierLimits(userDetails.subscriptionTier).max_endpoints_per_project) {
+        return ({ success: false, message: "Max endpoints reached" })
+    }
+
+
+
+    if (!allowed_ping_intervals.includes(data.intervalMinutes)) {
+        return {
+            success: false,
+            message: "Invalid interval"
+        }
+    }
+
+    // const getEndpoints 
+
+
 
     const db = await getDB();
 
@@ -49,16 +75,27 @@ export async function createEndpoint(data: {
 
     await db.collection("endpoints").insertOne(newEndpoint);
 
-    // Cache: Set endpoint data and add to project's endpoint list
     await redis.set(`endpoint:${newEndpoint.endpointId}`, serialize(newEndpoint));
     await redis.sadd(`project:${data.projectId}:endpoints`, newEndpoint.endpointId);
 
     await pingEndpoint(newEndpoint.endpointId)
     await updateProjectStatus(data.projectId);
     revalidatePath(`/project/${data.projectId}`);
-    return (newEndpoint.endpointId)
+    return ({
+        success: true, endpointId: newEndpoint.endpointId
+    })
 }
 
+// export async function getUserEndpoints(db?: Db) {
+//     const { userId } = await auth();
+//     if (!userId) throw new Error("Unauthorized");
+
+//     if (!db) db = await getDB();
+//     const projects = await getProjects(db);
+
+//     const userEndpoints = await db.collection("endpoints").find({ projectId: { $in: projects.map(p => p.projectId) } }).toArray();
+//     return userEndpoints;
+// }
 
 export async function getEndpoints(projectId: string) {
     const db = await getDB();
@@ -233,6 +270,8 @@ export async function deleteEndpoint(id: string) {
     // Invalidate Cache
     await redis.del(`endpoint:${id}`);
     await redis.srem(`project:${endpoint.projectId}:endpoints`, id);
+
+    await db.collection("logs").deleteMany({ endpointId: id })
 
     await updateProjectStatus(endpoint.projectId);
     revalidatePath(`/project/${endpoint.projectId}`);

@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from "uuid";
 import { updateProjectStatus } from "./pingActions";
 import redis from "@/lib/redis";
 import { deserialize, serialize } from "@/lib/utils";
+import { Db } from "mongodb";
+import { getTierLimits } from "@/lib/pricingTiers";
+import { getUserDetails } from "./userActions";
 
 export async function createProject(data: {
     projectName: string;
@@ -19,6 +22,14 @@ export async function createProject(data: {
 }) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
+
+    const userDetails = await getUserDetails(userId);
+    if (!userDetails) { return { success: false, error: "User not found" } }
+
+    const projects = await getProjects();
+    if (projects.length >= getTierLimits(userDetails?.subscriptionTier).max_projects) {
+        return { success: false, error: "Max projects reached" }
+    }
 
     const db = await getDB();
 
@@ -45,11 +56,11 @@ export async function createProject(data: {
 /**
  * Fetches all projects for the current Clerk user
  */
-export async function getProjects() {
+export async function getProjects(db?: Db) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    const db = await getDB();
+    if (!db) db = await getDB();
 
     // 1. Get Project IDs from Set (Try Cache)
     let projectIds = await redis.smembers(`user:${userId}:projects`);

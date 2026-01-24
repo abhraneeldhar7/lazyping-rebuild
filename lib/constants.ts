@@ -1,0 +1,1 @@
+export const allowed_ping_intervals = [15, 30, 60]

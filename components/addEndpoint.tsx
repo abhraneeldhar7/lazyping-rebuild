@@ -13,6 +13,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { copyToClipboard } from "@/lib/utils";
 import { createEndpoint } from "@/app/actions/endpointActions";
 import { useRouter } from "next/navigation";
+import { allowed_ping_intervals } from "@/lib/constants";
 
 export default function AddEndpointBtn({ projectId }: { projectId: string }) {
     const router = useRouter();
@@ -24,7 +25,7 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
         headers: null,
         body: "",
         projectId: projectId,
-        intervalMinutes: 10,
+        intervalMinutes: allowed_ping_intervals[0],
     }
     const [newEndpoint, setNewEndpoint] = useState(defaultNewEndpoint)
 
@@ -36,8 +37,12 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
         try {
             const res = await createEndpoint(newEndpoint);
             toast.success("Endpoint created successfully");
-            // setOpenDialog(false);
-            router.push(`/project/${projectId}/e/${res}`)
+            if (res.success) {
+                router.push(`/project/${projectId}/e/${res.endpointId}`)
+            } else {
+                toast.error(res.message)
+                setOpenDialog(false)
+            }
         } catch (e) {
             toast.error("Failed to create endpoint");
             setLoading(false);
@@ -173,10 +178,9 @@ export default function AddEndpointBtn({ projectId }: { projectId: string }) {
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectLabel>Ping every</SelectLabel>
-                                            <SelectItem value={"5"}>5 minutes</SelectItem>
-                                            <SelectItem value={"10"}>10 minutes</SelectItem>
-                                            <SelectItem value={"30"}>30 minutes</SelectItem>
-                                            <SelectItem value={"60"}>1 hour</SelectItem>
+                                            {allowed_ping_intervals.map((interval) => {
+                                                return <SelectItem key={interval} value={String(interval)}>{interval} minutes</SelectItem>
+                                            })}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>

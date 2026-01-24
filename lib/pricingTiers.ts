@@ -6,7 +6,6 @@ export interface TierLimits {
     allow_global_pings: boolean;
     max_history_days: number;
     min_ping_interval_minute: number;
-    team_members_allowed: boolean;
     max_team_members_per_project: number;
     pricing_per_month: {
         usd: number;
@@ -20,7 +19,6 @@ export const FREE_TIER_LIMITS: TierLimits = {
     allow_global_pings: false,
     max_history_days: 7,
     min_ping_interval_minute: 10,
-    team_members_allowed: false,
     max_team_members_per_project: 0,
     pricing_per_month: {
         usd: 0,
@@ -34,7 +32,6 @@ export const PRO_TIER_LIMITS: TierLimits = {
     allow_global_pings: true,
     max_history_days: 30,
     min_ping_interval_minute: 5,
-    team_members_allowed: true,
     max_team_members_per_project: 10,
     pricing_per_month: {
         usd: 1,
@@ -51,7 +48,7 @@ const TIER_LIMITS_MAP: Record<UserTierType, TierLimits> = {
 
 
 export function getTierLimits(tier: UserTierType): TierLimits {
-    return TIER_LIMITS_MAP[tier] || FREE_TIER_LIMITS;
+    return TIER_LIMITS_MAP[tier || "FREE"] || FREE_TIER_LIMITS;
 }
 
 

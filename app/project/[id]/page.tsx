@@ -14,8 +14,11 @@ import { pingEndpoint } from "@/app/actions/pingActions";
 import { toast } from "sonner";
 import { useState } from "react";
 import ProjectLoading from "./loading";
+import { useUser } from "@clerk/nextjs";
+import { getTierLimits } from "@/lib/pricingTiers";
 
 export default function ProjectPage() {
+    const user = useUser();
     const { projectData, endpoints, logs } = useProject();
     const router = useRouter();
     const [pingLoading, setPingLoading] = useState(false);
@@ -103,6 +106,9 @@ export default function ProjectPage() {
             </div>
         )
     }
+    const userMetadata = (user as any).publicMetadata
+
+    const allowNewEndpoint = endpoints.length < getTierLimits(userMetadata?.subscriptionTier || "Free").max_endpoints_per_project;
 
     return (
         <>
@@ -251,7 +257,9 @@ export default function ProjectPage() {
                     </div>
                 )}
 
-                <AddEndpointBtn projectId={projectData.projectId} />
+                {allowNewEndpoint &&
+                    <AddEndpointBtn projectId={projectData.projectId} />
+                }
 
             </div>
         </>

@@ -19,8 +19,8 @@ export default function FooterComponent() {
                 <div className="flex flex-col gap-[10px] md:text-right md:items-end">
                     <Link className="w-fit" href="/privacy-policy">Privacy Policy</Link>
                     <Link className="w-fit" href="https://veryneel.vercel.app" target="_blank">Contact</Link>
+                    <Link className="w-fit" href="#pricing">Pricing</Link>
                     <Link className="w-fit" href="https://x.com/veryNeel" target="_blank">Blogs</Link>
-
                 </div>
 
             </div>

@@ -1,5 +1,5 @@
 "use client"
-import { GithubIcon, Loader, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Input } from "./ui/input";
@@ -8,16 +8,23 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { createProject } from "@/app/actions/projectActions";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { getTierLimits } from "@/lib/pricingTiers";
 
 
-export default function NewProjectBtn() {
+export default function NewProjectBtn({ projectCount }: { projectCount: number }) {
+    const [openDialog, setOpenDialog] = useState(false);
     const [projectName, setProjectName] = useState<string>("")
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-    return (
-        <div >
-            <Dialog onOpenChange={() => { setProjectName("") }}>
+    const user = useUser();
+    const userMetadata = (user as any)?.publicMetadata;
+    const allowNewProject = projectCount < getTierLimits(userMetadata?.subscriptionTier || "Free")?.max_projects;
+
+    if (allowNewProject) {
+        return (
+            <Dialog open={openDialog} onOpenChange={(e) => { setOpenDialog(e); setProjectName("") }}>
                 <DialogTrigger asChild>
                     <Button variant="shinny">
                         New Project
@@ -37,9 +44,15 @@ export default function NewProjectBtn() {
                         };
                         try {
                             setLoading(true);
-                            const newProject = await createProject({ projectName: projectName, githubIntegration: null });
-                            toast.success("Project created successfully");
-                            router.push(`/project/${newProject.project.projectId}`)
+                            const res = await createProject({ projectName: projectName, githubIntegration: null });
+                            if (res.success) {
+                                toast.success("Project created successfully");
+                                router.push(`/project/${res.project.projectId}`)
+                            } else {
+                                toast.error(res.error);
+                                setOpenDialog(false);
+                                return;
+                            }
                         }
                         catch (error) {
                             toast.error("Failed to create project");
@@ -78,6 +91,9 @@ export default function NewProjectBtn() {
                     </form>
                 </DialogContent>
             </Dialog>
-        </div>
-    )
+        )
+    }
+    else {
+        return <></>
+    }
 }
