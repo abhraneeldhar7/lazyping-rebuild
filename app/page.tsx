@@ -146,8 +146,8 @@ export default function RootPage() {
         <div className="flex gap-[45px] flex-col max-w-[800px] w-full mx-auto">
             <div className="flex-1 px-[15px]">
                 <div>
-                    <h1 className="text-[24px] md:text-[34px] font-[500]">Detailed Performance Insights</h1>
-                    <p className="text-[14px] md:text-[16px]">Track and analyze your server performance with detailed insights and metrics.</p>
+                    <h1 className="text-[34px] font-[500] leading-[1.2em]">Detailed Performance Insights</h1>
+                    <p className="text-[16px] mt-[10px]">Track and analyze your server performance with detailed insights and metrics.</p>
                 </div>
             </div>
             <div className="flex-1 flex flex-col">
@@ -188,8 +188,8 @@ export default function RootPage() {
         <div className="flex gap-[25px] flex-col max-w-[800px] w-full mx-auto px-[15px]">
             <div className="flex-1">
                 <div>
-                    <h1 className="text-[24px] md:text-[34px] font-[500]">Pricing</h1>
-                    <p className="text-[14px] md:text-[16px]">I just added pricing to learn payment gateways. You can always fork the repo and host it yourself for free.</p>
+                    <h1 className="text-[34px] font-[500]">Pricing</h1>
+                    <p className="text-[16px] mt-[8px]">I just added pricing to learn payment gateways. You can always fork the repo and host it yourself for free.</p>
                 </div>
             </div>
 
