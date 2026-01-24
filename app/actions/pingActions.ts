@@ -27,6 +27,7 @@ function determinePingLogStatus(
 
     if (error) {
         if (error.name === "AbortError") return "TIMEOUT";
+        if (error.name === "TypeError" && error.message?.includes("Invalid URL")) return "INVALID_URL";
         if (error.cause?.code === "ENOTFOUND") return "DNS";
         if (error.cause?.code === "ECONNREFUSED") return "CONN_REFUSED";
         if (error.cause?.code === "UNABLE_TO_VERIFY_LEAF_SIGNATURE") return "TLS";
@@ -76,6 +77,8 @@ function generateLogSummary(
             return `Client error: ${statusCode} for ${url}`;
         case "HTTP_5XX":
             return `Server error: ${statusCode} for ${url}`;
+        case "INVALID_URL":
+            return `The URL provided is invalid: ${url}`;
         case "RESOLVED":
             return `Incident resolved. Endpoint is back online.`;
         default:
@@ -106,6 +109,11 @@ export async function pingEndpoint(
 
     const startTime = performance.now();
     try {
+        // Basic URL validation before fetch
+        if (!endpoint.url || !endpoint.url.startsWith("http")) {
+            throw new TypeError("Invalid URL");
+        }
+
         response = await fetch(endpoint.url, {
             method: endpoint.method,
             headers: endpoint.headers || {},
@@ -113,13 +121,32 @@ export async function pingEndpoint(
             signal: controller.signal,
         });
 
-        const text = await response.text();
+        // Read only first small chunk of response to avoid OOM for large files
+        const reader = response.body?.getReader();
+        if (reader) {
+            let receivedLength = 0;
+            const chunks = [];
+            while (receivedLength < 2000) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                receivedLength += value.length;
+            }
+            reader.cancel(); // Stop reading
+            const fullResult = new Uint8Array(receivedLength);
+            let offset = 0;
+            for (const chunk of chunks) {
+                fullResult.set(chunk, offset);
+                offset += chunk.length;
+            }
+            const text = new TextDecoder().decode(fullResult);
 
-        try {
-            const parsed = JSON.parse(text);
-            responseBody = JSON.stringify(parsed).slice(0, 500);
-        } catch {
-            responseBody = text.slice(0, 500);
+            try {
+                const parsed = JSON.parse(text);
+                responseBody = JSON.stringify(parsed).slice(0, 500);
+            } catch {
+                responseBody = text.slice(0, 500);
+            }
         }
     } catch (err) {
         error = err;
@@ -234,12 +261,15 @@ export async function pingEndpoint(
     };
     await redis.set(`endpoint:${endpoint.endpointId}`, serialize(updatedEndpointObj));
 
-    // Get current project status from cache to see if we need to force an update
-    const cachedProject = await deserialize<ProjectType>(await redis.get(`project:${endpoint.projectId}`));
-    const projectNeedsUpdate = statusChanged || (cachedProject && cachedProject.overallStatus === null);
+    try {
+        const cachedProject = await deserialize<ProjectType>(await redis.get(`project:${endpoint.projectId}`));
+        const projectNeedsUpdate = statusChanged || (cachedProject && cachedProject.overallStatus === null);
 
-    if (projectNeedsUpdate) {
-        await updateProjectStatus(endpoint.projectId, db);
+        if (projectNeedsUpdate) {
+            await updateProjectStatus(endpoint.projectId, db);
+        }
+    } catch (err) {
+        console.error(`Failed to update project status for ${endpoint.projectId}:`, err);
     }
 
     return JSON.parse(JSON.stringify(log));

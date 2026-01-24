@@ -8,15 +8,18 @@ export async function POST(req: Request) {
     }
 
     try {
-        // Fire and forget: Do not await this promise
-        await processScheduledPings().catch((err) => {
-            console.error("Background ping process failed:", err);
-        });
+        // Await the process to catch batch failures
+        const result = await processScheduledPings();
 
-        // Return immediately to the cron caller
-        return NextResponse.json({ success: true, message: "Ping process started in background" });
+        return NextResponse.json({
+            success: true,
+            message: "Ping process completed",
+            ...result
+        });
     } catch (error: any) {
-        console.error("Cron trigger failed:", error);
-        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+        console.error("Cron batch failure:", error);
+        return NextResponse.json({
+            error: error.message || "Internal Server Error"
+        }, { status: 500 });
     }
 }

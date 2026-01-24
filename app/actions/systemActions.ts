@@ -1,30 +1,26 @@
 "use server"
-
 import { getDB } from "@/lib/db";
+import { EndpointType } from "@/lib/types";
 import { pingEndpoint } from "./pingActions";
-// import { PingLog, ProjectType } from "@/lib/types";
-// import { Db } from "mongodb";
 
 export async function processScheduledPings() {
     const db = await getDB();
-    const now = new Date(); // Use Date object for comparison if stored as Date in DB
+    const now = new Date();
 
-    const dueEndpoints = await db.collection("endpoints")
+    const dueEndpoints = (await db.collection("endpoints")
         .find({
             enabled: true,
             nextPingAt: { $lte: now }
         })
-        .toArray();
+        .toArray()) as unknown as EndpointType[];
 
     if (dueEndpoints.length === 0) return { processed: 0 };
 
-    // Process pings in parallel (or limit concurrency if needed for large scale)
     const pingPromises = dueEndpoints.map(async (endpoint) => {
         try {
-            // @ts-ignore
             await pingEndpoint(endpoint, db);
-        } catch (error) {
-            console.error(`Failed to process ping for ${endpoint.endpointId}:`, error);
+        } catch (error: any) {
+            console.error(`[CRON ERROR] Individual ping failed for ${endpoint.endpointName} (${endpoint.endpointId}):`, error.message || error);
         }
     });
 

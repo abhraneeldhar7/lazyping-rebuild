@@ -45,7 +45,7 @@ export interface PingLog {
     method: "GET" | "PUT" | "DELETE" | "POST",
     status: "OK" | "TIMEOUT" | "DNS" | "CONN_REFUSED" | "TLS" |
     "HTTP_4XX" | "HTTP_5XX" | "RATE_LIMITED" |
-    "BLOCKED" | "UNKNOWN" | "RESOLVED",
+    "BLOCKED" | "UNKNOWN" | "RESOLVED" | "INVALID_URL",
     responseMessage: string | null,
     errorMessage?: string | null,
     statusCode: number | null,

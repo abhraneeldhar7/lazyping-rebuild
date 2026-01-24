@@ -2,8 +2,6 @@
 
 **Down detector, performance monitoring, and public status pages. All open source.**
 
-LazyPing is a robust, self-hosted monitoring solution designed to keep your services in check. Monitor endpoints, track latency, and provide transparency with beautiful public status pages.
-
 ![Homepage Img](/app/opengraph-image.png)
 
 ---
