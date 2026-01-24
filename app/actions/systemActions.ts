@@ -10,7 +10,7 @@ export async function processScheduledPings() {
     const dueEndpoints = (await db.collection("endpoints")
         .find({
             enabled: true,
-            nextPingAt: { $lte: now }
+            nextPingAt: { $lte: new Date() }
         })
         .toArray()) as unknown as EndpointType[];
 
