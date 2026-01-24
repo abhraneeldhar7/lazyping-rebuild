@@ -40,7 +40,7 @@ export default function RootPage() {
                     <SheetTrigger asChild>
                         <MenuIcon size={25} />
                     </SheetTrigger>
-                    <SheetContent side="right" className="border-0 outline-0 ring-0 bg-background/70 dark:bg-background/5 backdrop-blur-[25px] p-[20px] w-full">
+                    <SheetContent showCloseButton={false} side="right" className="border-0 outline-0 ring-0 bg-background/70 dark:bg-background/5 backdrop-blur-[25px] p-[20px] w-full">
                         <SheetHeader className="hidden">
                             <SheetTitle /><SheetDescription />
                         </SheetHeader>
@@ -179,12 +179,8 @@ export default function RootPage() {
             <PublicLagesAll />
         </div> */}
 
-        <div id="pricing" className="flex justify-center my-[50px]" >
-            <Link href="/login" className="w-fit mb-[60px]">
-                <Button variant="shinny" className="md:w-[140px] w-full text-[20px] md:h-[50px] h-[55px] hover:scale-[1.01]">Get Started</Button>
-            </Link>
-        </div>
 
+        <div id="pricing" />
         <div className="flex gap-[25px] flex-col max-w-[800px] w-full mx-auto px-[15px]">
             <div className="flex-1">
                 <div>
@@ -194,28 +190,38 @@ export default function RootPage() {
             </div>
 
             <div className="flex gap-[15px] md:flex-row flex-col">
-                <div className="flex-1 flex flex-col rounded-[5px] border p-[15px] pt-[10px] bg-muted">
-                    <div className="flex justify-between">
-                        <h1 className="text-[24px]">Free plan</h1>
-                        <h1 className="text-[30px]">${getTierLimits("FREE").pricing_per_month.usd}</h1>
+                <div className="flex-1 flex flex-col rounded-[5px] border bg-muted">
+                    <div className="p-[15px] pt-[10px]">
+                        <div className="flex justify-between">
+                            <h1 className="text-[24px]">Free plan</h1>
+                            <h1 className="text-[30px]">${getTierLimits("FREE").pricing_per_month.usd}</h1>
+                        </div>
+                        <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_projects} projects</p>
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_endpoints_per_project} endpoints per project</p>
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_history_days} days performance history</p>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_projects} projects</p>
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_endpoints_per_project} endpoints per project</p>
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("FREE").max_history_days} days performance history</p>
+                    <div className="p-[7px]">
+                        <Link href="/login" className="h-[45px] bg-foreground text-background font-[500] text-[18px] rounded-[4px] flex items-center justify-center w-full">Continue</Link>
                     </div>
                 </div>
 
 
-                <div className="flex-1 flex flex-col rounded-[5px] border p-[15px] pt-[10px] bg-muted">
-                    <div className="flex justify-between">
-                        <h1 className="text-[26px]"><span className="text-[var(--primary)]">Pro</span></h1>
-                        <h1 className="text-[30px]">${getTierLimits("PRO").pricing_per_month.usd}</h1>
+                <div className="flex-1 flex flex-col rounded-[5px] border bg-muted">
+                    <div className="p-[15px] pt-[10px]">
+                        <div className="flex justify-between">
+                            <h1 className="text-[26px]"><span className="text-[var(--primary)]">Pro</span></h1>
+                            <h1 className="text-[30px]">${getTierLimits("PRO").pricing_per_month.usd}</h1>
+                        </div>
+                        <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_projects} projects</p>
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_endpoints_per_project} endpoints per project</p>
+                            <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_history_days} days performance history</p>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-[15px] text-[16px] leading-[1em] mt-[10px]">
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_projects} projects</p>
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_endpoints_per_project} endpoints per project</p>
-                        <p className="flex gap-[10px]"><CircleCheck size={17} className="text-[var(--success)]" /> {getTierLimits("PRO").max_history_days} days performance history</p>
+                    <div className="p-[7px]">
+                        <Link href="/login" className="h-[45px] bg-primary text-[white] font-[500] text-[18px] rounded-[4px] flex items-center justify-center w-full">Continue</Link>
                     </div>
                 </div>
             </div>
